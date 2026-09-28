@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TrialDesignBench</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/night.css" id="theme">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/monokai.css">
+</head>
+<body>
+<div class="reveal">
+  <div class="slides">
+
+    <section>
+      <h1>TrialDesignBench</h1>
+      <p>Benchmarking AI agents on clinical trial statistical design</p>
+    </section>
+
+    <section>
+      <h2>What it is</h2>
+      <ul>
+        <li>A benchmark for evaluating whether AI agents can <strong>reproduce</strong> or <strong>design</strong> clinical trial statistical designs</li>
+        <li>Each case = one trial × one benchmark task</li>
+        <li>Closed-book: the model sees only the protocol/SAP, not prior knowledge of the trial</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>A case = 3 inputs</h2>
+      <ol>
+        <li>Shared statistician-role system prompt (same for every case)</li>
+        <li>Question blocks (extraction vs. derivation) for the trial</li>
+        <li>The trial's protocol/SAP source document</li>
+      </ol>
+      <p><small>The held-out answer key never enters a run's context</small></p>
+    </section>
+
+    <section>
+      <h2>Question types</h2>
+      <table>
+        <thead><tr><th>Type</th><th>Ask</th></tr></thead>
+        <tbody>
+          <tr><td>Extraction</td><td>Report a value found directly in the document</td></tr>
+          <tr><td>Derivation</td><td>Identify inputs, calculate, and explain method (verified by re-running the calculation)</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>Grading</h2>
+      <ul>
+        <li>Rubric criteria per prompt, weighted by importance</li>
+        <li>Concept match required, not keyword match</li>
+        <li>Independent verification pass before a grade is finalized</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Results</h2>
+      <p><em>— to add —</em></p>
+    </section>
+
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/highlight.js"></script>
+<script>
+  Reveal.initialize({
+    hash: true,
+    plugins: [ RevealHighlight ]
+  });
+</script>
+</body>
+</html>
