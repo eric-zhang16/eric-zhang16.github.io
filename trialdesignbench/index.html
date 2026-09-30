@@ -175,7 +175,7 @@
       <div class="two-col">
         <div class="col">
           <h4>Skill structure</h4>
-          <pre><code class="hljs">group-sequential-design/
+          <pre><code class="nohighlight">group-sequential-design/
 ├── SKILL.md            # Q&A workflow, design steps
 ├── reference.md        # design rules, spending fns, alpha recycling
 ├── examples.md         # R code by design pattern
@@ -187,7 +187,7 @@
         </div>
         <div class="col">
           <h4>Output structure</h4>
-          <pre><code class="hljs">output/gsd_{disease}_{endpoints}_{date}/
+          <pre><code class="nohighlight">output/gsd_{disease}_{endpoints}_{date}/
 ├── gsd_design.R
 ├── gsd_results.json
 ├── multiplicity_diagram.png
@@ -204,18 +204,25 @@
       <h2>Benchmark Run: Evaluating the Skill</h2>
       <p class="what-it-does">
         Any technical addition to an agent — skill, tool, workflow — should be benchmarked with-vs-without, not assumed to help.
-        <a href="https://github.com/RConsortium/pharma-skills/issues/146" target="_blank">21 design scenarios, skill vs. no-skill</a>:
+        <a href="https://github.com/RConsortium/pharma-skills/issues/146" target="_blank">21 design scenarios, skill vs. no-skill</a> — overall scorecard (best-with-skill run per scenario):
       </p>
+      <table style="font-size: 0.5em; margin: 0 auto 0.9em;">
+        <thead><tr><th></th><th>With Skill</th><th>Without Skill</th></tr></thead>
+        <tbody>
+          <tr><td style="text-align:left;">Skill wins</td><td>16</td><td>—</td></tr>
+          <tr><td style="text-align:left;">Ties</td><td>4 (#3, #21, #60, #113)</td><td>—</td></tr>
+          <tr><td style="text-align:left;">No-skill wins</td><td>1 (#139)</td><td>—</td></tr>
+          <tr><td style="text-align:left;">Avg score <span style="color:#9aa3b2;">(excl. #60 trivial)</span></td><td><strong>90%</strong></td><td><strong>62%</strong></td></tr>
+        </tbody>
+      </table>
       <div class="three-col">
         <div class="col">
           <h4>1 · Does it add value?</h4>
-          <div class="stat-num">16 W · 4 T · 1 L</div>
-          <div class="stat-sub">skill wins 16/21 scenarios, ties 4, loses 1 (#139 — structural gap, fix in progress)</div>
+          <div class="stat-sub">16/21 wins, 4 ties, 1 loss (#139 — structural gap, fix in progress)</div>
         </div>
         <div class="col">
           <h4>2 · How good with skill?</h4>
-          <div class="stat-num">90% <span style="color:#9aa3b2; font-weight:400;">vs 62%</span></div>
-          <div class="stat-sub">avg rubric score, skill vs. no-skill, at each scenario's best run</div>
+          <div class="stat-sub">90% avg vs. 62% no-skill, at each scenario's best run</div>
         </div>
         <div class="col">
           <h4>3 · Failure patterns</h4>
