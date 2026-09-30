@@ -53,23 +53,13 @@
   .ai-sub { font-size: 0.38em; color: #b7bfcb; margin-top: 0.3em; line-height: 1.3; }
   .arrow { font-size: 1.3em; color: #7aa2f7; }
   .reveal h2 { font-size: 1.35em; margin-bottom: 0.4em; }
-  .loop-wrap {
-    position: relative;
-    margin-top: -0.3em;
-    text-align: center;
-  }
-  .loop-arrow {
-    width: 82%;
-    height: 40px;
-    display: block;
-    margin: 0 auto;
-  }
   .loop-label {
-    font-size: 0.38em;
+    font-size: 0.5em;
     color: #7aa2f7;
     font-weight: 700;
-    margin-top: -0.2em;
+    margin-top: 0.8em;
     letter-spacing: 0.02em;
+    text-align: center;
   }
 </style>
 </head>
@@ -93,31 +83,19 @@
             <div class="ai-title">Context</div>
             <div class="ai-sub">memory · knowledge (RAG) · workflow (skills)</div>
           </div>
-          <div class="arrow">→</div>
           <div class="ai-box llm">
             <div class="ai-icon">🧠</div>
             <div class="ai-title">LLM</div>
             <div class="ai-sub">the brain</div>
           </div>
-          <div class="arrow">→</div>
           <div class="ai-box">
             <div class="ai-icon">🔧</div>
             <div class="ai-title">Tools</div>
             <div class="ai-sub">e.g. MCP</div>
           </div>
         </div>
-        <div class="loop-wrap">
-          <svg class="loop-arrow" viewBox="0 0 600 60" preserveAspectRatio="none">
-            <defs>
-              <marker id="loopHead" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
-                <path d="M0,0 L8,4 L0,8 z" fill="#7aa2f7"/>
-              </marker>
-            </defs>
-            <path d="M 580 4 C 300 65, 300 65, 20 4" fill="none" stroke="#7aa2f7" stroke-width="3" marker-end="url(#loopHead)"/>
-          </svg>
-          <div class="loop-label">↺ repeat: call tool → update context → decide next step, until task complete</div>
-        </div>
       </div>
+      <div class="loop-label">↺ repeat: call tool → update context → decide next step, until task complete</div>
     </section>
 
     <section>
