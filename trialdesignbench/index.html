@@ -94,6 +94,40 @@
     font-size: 0.55em;
     text-align: center;
   }
+  .three-col {
+    display: flex;
+    gap: 1.1em;
+    text-align: left;
+    margin-top: 0.8em;
+  }
+  .three-col .col {
+    flex: 1;
+    background: #1e1e1e;
+    border: 1px solid #333844;
+    border-radius: 10px;
+    padding: 0.8em 0.9em;
+  }
+  .three-col h4 {
+    font-size: 0.55em;
+    color: #7aa2f7;
+    margin: 0 0 0.4em;
+  }
+  .three-col .stat-num {
+    font-size: 0.9em;
+    font-weight: 700;
+    color: #e8e8e8;
+  }
+  .three-col .stat-sub {
+    font-size: 0.4em;
+    color: #9aa3b2;
+    margin-top: 0.2em;
+  }
+  .three-col ul {
+    margin: 0;
+    padding-left: 1em;
+    font-size: 0.4em;
+    line-height: 1.55;
+  }
 </style>
 </head>
 <body>
@@ -164,6 +198,34 @@
         </div>
       </div>
       <p class="demo-link">🎥 <a href="https://drive.google.com/file/d/1fW2CuVbp9XLnt1J6DwzsfKOtgABFPZ8t/view?usp=drive_link" target="_blank">Demo video</a></p>
+    </section>
+
+    <section>
+      <h2>Benchmark Run: Evaluating the Skill</h2>
+      <p class="what-it-does">
+        Any technical addition to an agent — skill, tool, workflow — should be benchmarked with-vs-without, not assumed to help.
+        <a href="https://github.com/RConsortium/pharma-skills/issues/146" target="_blank">21 design scenarios, skill vs. no-skill</a>:
+      </p>
+      <div class="three-col">
+        <div class="col">
+          <h4>1 · Does it add value?</h4>
+          <div class="stat-num">16 W · 4 T · 1 L</div>
+          <div class="stat-sub">skill wins 16/21 scenarios, ties 4, loses 1 (#139 — structural gap, fix in progress)</div>
+        </div>
+        <div class="col">
+          <h4>2 · How good with skill?</h4>
+          <div class="stat-num">90% <span style="color:#9aa3b2; font-weight:400;">vs 62%</span></div>
+          <div class="stat-sub">avg rubric score, skill vs. no-skill, at each scenario's best run</div>
+        </div>
+        <div class="col">
+          <h4>3 · Failure patterns</h4>
+          <ul>
+            <li><strong>P0</strong> multi-arm + secondary-endpoint multiplicity breadth — 82%, loses to no-skill</li>
+            <li><strong>P1</strong> missing competing-risks detection — 56%, both agents fail</li>
+            <li><strong>P2</strong> futility-only / zero-alpha allocation — 50%</li>
+          </ul>
+        </div>
+      </div>
     </section>
 
     <section>
