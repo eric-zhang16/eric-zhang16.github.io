@@ -141,14 +141,15 @@
       <div class="two-col">
         <div class="col">
           <h4>Skill structure</h4>
-          <ul>
-            <li><code>SKILL.md</code> — Q&amp;A workflow, design steps</li>
-            <li><code>reference.md</code> — design rules, spending functions, alpha recycling</li>
-            <li><code>examples.md</code> — R code by design pattern</li>
-            <li><code>post_design.md</code> — timing checks, verification</li>
-            <li><code>scripts/</code> — R + Python helpers</li>
-          </ul>
-          <p style="font-size:0.42em; color:#9aa3b2; margin-top:0.6em;">Loaded lazily — only pulled into context when the workflow reaches that step</p>
+          <pre><code class="hljs">group-sequential-design/
+├── SKILL.md            # Q&A workflow, design steps
+├── reference.md        # design rules, spending fns, alpha recycling
+├── examples.md         # R code by design pattern
+├── post_design.md      # timing checks, verification
+└── scripts/
+    ├── compute_event_prob.R
+    └── gsd_report_template.py</code></pre>
+          <p style="font-size:0.42em; color:#9aa3b2; margin-top:0.6em;">Loaded progressively — only pulled into context when the workflow reaches that step</p>
         </div>
         <div class="col">
           <h4>Output structure</h4>
