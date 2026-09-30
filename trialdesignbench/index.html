@@ -7,6 +7,48 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/night.css" id="theme">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/monokai.css">
+<style>
+  .harness {
+    border: 2px dashed #5b6472;
+    border-radius: 16px;
+    padding: 2.2em 1.5em 1.5em;
+    margin-top: 1em;
+    position: relative;
+  }
+  .harness-label {
+    position: absolute;
+    top: -0.75em;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #191919;
+    padding: 0.15em 0.9em;
+    font-size: 0.5em;
+    color: #9aa3b2;
+    white-space: nowrap;
+    border-radius: 6px;
+  }
+  .ai-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6em;
+  }
+  .ai-box {
+    flex: 1;
+    border-radius: 12px;
+    padding: 0.9em 0.8em;
+    background: #232323;
+    border: 1px solid #3a3f4a;
+  }
+  .ai-box.llm {
+    background: #2a3550;
+    border-color: #7aa2f7;
+  }
+  .ai-icon { font-size: 1.6em; }
+  .ai-title { font-size: 0.62em; font-weight: 700; margin-top: 0.15em; }
+  .ai-sub { font-size: 0.38em; color: #b7bfcb; margin-top: 0.3em; line-height: 1.3; }
+  .arrow { font-size: 1.3em; color: #7aa2f7; }
+</style>
 </head>
 <body>
 <div class="reveal">
@@ -15,6 +57,32 @@
     <section>
       <h1>TrialDesignBench</h1>
       <p>Benchmarking AI agents on clinical trial statistical design</p>
+    </section>
+
+    <section>
+      <h2>Agent Intelligence</h2>
+      <div class="harness">
+        <div class="harness-label">Harness — right context, right time</div>
+        <div class="ai-row">
+          <div class="ai-box">
+            <div class="ai-icon">🗂️</div>
+            <div class="ai-title">Context</div>
+            <div class="ai-sub">memory · knowledge (data) · workflow (skills)</div>
+          </div>
+          <div class="arrow">⇄</div>
+          <div class="ai-box llm">
+            <div class="ai-icon">🧠</div>
+            <div class="ai-title">LLM</div>
+            <div class="ai-sub">the brain</div>
+          </div>
+          <div class="arrow">⇄</div>
+          <div class="ai-box">
+            <div class="ai-icon">🔧</div>
+            <div class="ai-title">Tools</div>
+            <div class="ai-sub">e.g. MCP</div>
+          </div>
+        </div>
+      </div>
     </section>
 
     <section>
