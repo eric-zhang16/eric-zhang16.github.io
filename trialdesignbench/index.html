@@ -61,6 +61,39 @@
     letter-spacing: 0.02em;
     text-align: center;
   }
+  .what-it-does {
+    font-size: 0.62em;
+    color: #d8dee9;
+    text-align: left;
+    margin: 0.6em 0 1em;
+  }
+  .two-col {
+    display: flex;
+    gap: 1.8em;
+    text-align: left;
+  }
+  .two-col .col { flex: 1; }
+  .two-col h4 {
+    font-size: 0.65em;
+    color: #7aa2f7;
+    margin: 0 0 0.35em;
+  }
+  .two-col ul {
+    margin: 0;
+    padding-left: 1em;
+    font-size: 0.52em;
+    line-height: 1.55;
+  }
+  .two-col pre {
+    font-size: 0.42em;
+    width: 100%;
+    box-shadow: none;
+  }
+  .demo-link {
+    margin-top: 1em;
+    font-size: 0.55em;
+    text-align: center;
+  }
 </style>
 </head>
 <body>
@@ -96,6 +129,40 @@
         </div>
       </div>
       <div class="loop-label">↺ repeat: call tool → update context → decide next step, until task complete</div>
+    </section>
+
+    <section>
+      <h2>Example: Expanding Context with a Skill</h2>
+      <p class="what-it-does">
+        <a href="https://github.com/RConsortium/pharma-skills/tree/main/group-sequential-design" target="_blank">Group Sequential Design skill</a> —
+        given a trial scenario, it designs a group sequential survival-endpoint trial: boundaries, sample size,
+        multiplicity strategy, and a simulation-verified report, through a guided Q&amp;A.
+      </p>
+      <div class="two-col">
+        <div class="col">
+          <h4>Skill structure</h4>
+          <ul>
+            <li><code>SKILL.md</code> — Q&amp;A workflow, design steps</li>
+            <li><code>reference.md</code> — design rules, spending functions, alpha recycling</li>
+            <li><code>examples.md</code> — R code by design pattern</li>
+            <li><code>post_design.md</code> — timing checks, verification</li>
+            <li><code>scripts/</code> — R + Python helpers</li>
+          </ul>
+          <p style="font-size:0.42em; color:#9aa3b2; margin-top:0.6em;">Loaded lazily — only pulled into context when the workflow reaches that step</p>
+        </div>
+        <div class="col">
+          <h4>Output structure</h4>
+          <pre><code class="hljs">output/gsd_{disease}_{endpoints}_{date}/
+├── gsd_design.R
+├── gsd_results.json
+├── multiplicity_diagram.png
+├── gsd_verification.R
+├── gsd_verification_log.md
+├── gsd_report.py
+└── gsd_report.docx</code></pre>
+        </div>
+      </div>
+      <p class="demo-link">🎥 <a href="https://drive.google.com/file/d/1fW2CuVbp9XLnt1J6DwzsfKOtgABFPZ8t/view?usp=drive_link" target="_blank">Demo video</a></p>
     </section>
 
     <section>
