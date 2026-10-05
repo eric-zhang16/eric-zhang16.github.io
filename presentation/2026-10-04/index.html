@@ -141,6 +141,44 @@
     border-radius: 6px;
     cursor: zoom-in;
   }
+  .logo-row {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 0.3em;
+  }
+  .tdb-logo {
+    width: 72px;
+    height: 72px;
+    border-radius: 16px;
+    box-shadow: 0 0 20px rgba(122,162,247,0.35);
+  }
+  .progress-stat {
+    text-align: center;
+    margin: 0.4em auto 0.8em;
+    max-width: 420px;
+  }
+  .progress-num {
+    font-size: 0.75em;
+    font-weight: 700;
+    color: #e8e8e8;
+  }
+  .progress-bar {
+    width: 100%;
+    height: 14px;
+    background: #232323;
+    border-radius: 7px;
+    overflow: hidden;
+    margin: 0.5em 0;
+    border: 1px solid #3a3f4a;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #7aa2f7, #2a9d8f);
+  }
+  .progress-label {
+    font-size: 0.42em;
+    color: #9aa3b2;
+  }
 </style>
 </head>
 <body>
@@ -321,8 +359,19 @@
     </section>
 
     <section>
-      <h2>Results</h2>
-      <p><em>— to add —</em></p>
+      <h2>Where We Are — Join Us</h2>
+      <div class="logo-row">
+        <img src="assets/tdb-logo.webp" alt="TrialDesignBench logo" class="tdb-logo">
+      </div>
+      <div class="progress-stat">
+        <div class="progress-num">26 / 100 trials</div>
+        <div class="progress-bar"><div class="progress-fill" style="width:26%"></div></div>
+        <div class="progress-label">toward the target benchmark size</div>
+      </div>
+      <p class="what-it-does" style="text-align:center; margin-top:1em;">
+        <strong>We'd love your help.</strong> Write a test case — question + rubrics — from a protocol/SAP you know well or find interesting, and help stress-test AI on real trial design.
+      </p>
+      <p class="demo-link">🔬 <a href="https://huggingface.co/spaces/trialdesignbench/tdb-intake" target="_blank">Submit a case via the intake form ↗</a></p>
     </section>
 
   </div>
