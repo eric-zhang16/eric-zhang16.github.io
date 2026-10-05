@@ -289,36 +289,6 @@
     </section>
 
     <section>
-      <h2>A case = 3 inputs</h2>
-      <ol>
-        <li>Shared statistician-role system prompt (same for every case)</li>
-        <li>Question blocks (extraction vs. derivation) for the trial</li>
-        <li>The trial's protocol/SAP source document</li>
-      </ol>
-      <p><small>The held-out answer key never enters a run's context</small></p>
-    </section>
-
-    <section>
-      <h2>Question types</h2>
-      <table>
-        <thead><tr><th>Type</th><th>Ask</th></tr></thead>
-        <tbody>
-          <tr><td>Extraction</td><td>Report a value found directly in the document</td></tr>
-          <tr><td>Derivation</td><td>Identify inputs, calculate, and explain method (verified by re-running the calculation)</td></tr>
-        </tbody>
-      </table>
-    </section>
-
-    <section>
-      <h2>Grading</h2>
-      <ul>
-        <li>Rubric criteria per prompt, weighted by importance</li>
-        <li>Concept match required, not keyword match</li>
-        <li>Independent verification pass before a grade is finalized</li>
-      </ul>
-    </section>
-
-    <section>
       <h2>Example: Question → Rubric → Grade</h2>
       <p class="what-it-does">KN189 (KEYNOTE-189), P-004 — derivation question:</p>
       <p style="font-size:0.5em; background:#1e1e1e; border:1px solid #333844; border-radius:8px; padding:0.6em 0.9em; margin:0 0 0.8em;">
