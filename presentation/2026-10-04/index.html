@@ -131,9 +131,7 @@
   .diagram-card {
     background: #fff;
     border-radius: 12px;
-    padding: 0.5em;
-    margin: 0.6em auto 0;
-    max-width: 480px;
+    padding: 0.4em;
     box-shadow: 0 0 20px rgba(0,0,0,0.35);
   }
   .diagram-card img {
@@ -249,18 +247,24 @@
     </section>
 
     <section>
-      <h2>What it is</h2>
-      <ul>
-        <li>A benchmark for evaluating whether AI agents can <strong>reproduce</strong> or <strong>design</strong> clinical trial statistical designs — <strong>two benchmarks</strong>, same 100 trials</li>
-        <li><strong>Benchmark 1</strong> — reproduce: closed-book, given the SAP/protocol</li>
-        <li><strong>Benchmark 2</strong> — design: no SAP, only disease/treatment/regulatory/sponsor context</li>
-      </ul>
-      <a href="assets/benchmark-workflow.svg" target="_blank">
-        <div class="diagram-card">
-          <img src="assets/benchmark-workflow.svg" alt="TrialDesignBench workflow: Step 1 builds prompt and rubrics from a statistician intake form; Step 2 (Benchmark 1) reproduces the design closed-book from the SAP/protocol; Step 3 (Benchmark 2) designs a new trial for the same case without the SAP, using disease, treatment, regulatory, and sponsor context, evaluated by industry statisticians for realism, relevance, and feasibility.">
+      <h2>TrialDesignBench</h2>
+      <div class="two-col">
+        <div class="col">
+          <ul style="font-size:0.42em;">
+            <li>Evaluates whether AI agents can <strong>reproduce</strong> or <strong>design</strong> clinical trial statistical designs</li>
+            <li><strong>Benchmark 1</strong> — reproduce, closed-book with SAP/protocol</li>
+            <li><strong>Benchmark 2</strong> — design, no SAP, only context (disease, treatment, regulatory, sponsor)</li>
+          </ul>
+          <p class="demo-link" style="text-align:left; margin-top:0.8em;">🔎 <a href="https://github.com/BBSW-org/TrialDesignBench/issues/4" target="_blank">Full workflow spec</a></p>
         </div>
-      </a>
-      <p class="demo-link">🔎 <a href="https://github.com/BBSW-org/TrialDesignBench/issues/4" target="_blank">Full workflow spec</a> · click diagram to zoom</p>
+        <div class="col">
+          <a href="assets/benchmark-workflow.svg" target="_blank">
+            <div class="diagram-card">
+              <img src="assets/benchmark-workflow.svg" alt="TrialDesignBench workflow: Step 1 builds prompt and rubrics from a statistician intake form; Step 2 (Benchmark 1) reproduces the design closed-book from the SAP/protocol; Step 3 (Benchmark 2) designs a new trial for the same case without the SAP, using disease, treatment, regulatory, and sponsor context, evaluated by industry statisticians for realism, relevance, and feasibility.">
+            </div>
+          </a>
+        </div>
+      </div>
     </section>
 
     <section>
