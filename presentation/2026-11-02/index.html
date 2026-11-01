@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TrialDesignBench</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/night.css" id="theme">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/monokai.css">
+<style>
+  .harness {
+    border: 3px solid #7aa2f7;
+    border-radius: 16px;
+    padding: 2.4em 1.5em 1.8em;
+    margin-top: 1em;
+    position: relative;
+    background: radial-gradient(ellipse at center, rgba(122,162,247,0.10), transparent 70%);
+    box-shadow: 0 0 28px rgba(122,162,247,0.25);
+  }
+  .harness-label {
+    position: absolute;
+    top: -0.85em;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #7aa2f7;
+    color: #101522;
+    padding: 0.25em 1.1em;
+    font-size: 0.55em;
+    font-weight: 700;
+    white-space: nowrap;
+    border-radius: 8px;
+    letter-spacing: 0.02em;
+  }
+  .ai-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6em;
+  }
+  .ai-box {
+    flex: 1;
+    border-radius: 12px;
+    padding: 0.9em 0.8em;
+    background: #232323;
+    border: 1px solid #3a3f4a;
+  }
+  .ai-box.llm {
+    background: #2a3550;
+    border-color: #7aa2f7;
+  }
+  .ai-icon { font-size: 1.6em; }
+  .ai-title { font-size: 0.62em; font-weight: 700; margin-top: 0.15em; }
+  .ai-sub { font-size: 0.38em; color: #b7bfcb; margin-top: 0.3em; line-height: 1.3; }
+  .arrow { font-size: 1.3em; color: #7aa2f7; }
+  .reveal h2 { font-size: 1.35em; margin-bottom: 0.4em; }
+  .loop-label {
+    font-size: 0.5em;
+    color: #7aa2f7;
+    font-weight: 700;
+    margin-top: 0.8em;
+    letter-spacing: 0.02em;
+    text-align: center;
+  }
+  .what-it-does {
+    font-size: 0.62em;
+    color: #d8dee9;
+    text-align: left;
+    margin: 0.6em 0 1em;
+  }
+  .two-col {
+    display: flex;
+    gap: 1.8em;
+    text-align: left;
+  }
+  .two-col .col { flex: 1; }
+  .two-col h4 {
+    font-size: 0.65em;
+    color: #7aa2f7;
+    margin: 0 0 0.35em;
+  }
+  .two-col ul {
+    margin: 0;
+    padding-left: 1em;
+    font-size: 0.52em;
+    line-height: 1.55;
+  }
+  .two-col pre {
+    font-size: 0.42em;
+    width: 100%;
+    box-shadow: none;
+  }
+  .demo-link {
+    margin-top: 1em;
+    font-size: 0.55em;
+    text-align: center;
+  }
+  .three-col {
+    display: flex;
+    gap: 1.1em;
+    text-align: left;
+    margin-top: 0.8em;
+  }
+  .three-col .col {
+    flex: 1;
+    background: #1e1e1e;
+    border: 1px solid #333844;
+    border-radius: 10px;
+    padding: 0.8em 0.9em;
+  }
+  .three-col h4 {
+    font-size: 0.55em;
+    color: #7aa2f7;
+    margin: 0 0 0.4em;
+  }
+  .three-col .stat-num {
+    font-size: 0.9em;
+    font-weight: 700;
+    color: #e8e8e8;
+  }
+  .three-col .stat-sub {
+    font-size: 0.4em;
+    color: #9aa3b2;
+    margin-top: 0.2em;
+  }
+  .three-col ul {
+    margin: 0;
+    padding-left: 1em;
+    font-size: 0.4em;
+    line-height: 1.55;
+  }
+  .diagram-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 0.4em;
+    box-shadow: 0 0 20px rgba(0,0,0,0.35);
+  }
+  .diagram-card img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 6px;
+    cursor: zoom-in;
+  }
+  .logo-row {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 0.3em;
+  }
+  .tdb-logo {
+    height: 80px;
+    width: auto;
+    filter: drop-shadow(0 0 16px rgba(122,162,247,0.35));
+  }
+  .progress-stat {
+    text-align: center;
+    margin: 0.4em auto 0.8em;
+    max-width: 420px;
+  }
+  .progress-num {
+    font-size: 0.75em;
+    font-weight: 700;
+    color: #e8e8e8;
+  }
+  .progress-bar {
+    width: 100%;
+    height: 14px;
+    background: #232323;
+    border-radius: 7px;
+    overflow: hidden;
+    margin: 0.5em 0;
+    border: 1px solid #3a3f4a;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #7aa2f7, #2a9d8f);
+  }
+  .progress-label {
+    font-size: 0.42em;
+    color: #9aa3b2;
+  }
+</style>
+</head>
+<body>
+<div class="reveal">
+  <div class="slides">
+
+    <section>
+      <h2>TrialDesignBench</h2>
+      <p>Workflow-Specific Benchmarking for AI Agents in Clinical Trial Design: A Group Sequential Design Case Study</p>
+      <p><small>Eric Zhang &nbsp;·&nbsp; Eikon Therapeutics &nbsp;·&nbsp; 11/02/2026 &nbsp;&middot;&nbsp; SLDS 2026</small></p>
+    </section>
+
+    <section>
+      <h2>Agent Intelligence in Practice</h2>
+      <div class="harness">
+        <div class="harness-label">⚙ Harness — right context, right time</div>
+        <div class="ai-row">
+          <div class="ai-box">
+            <div class="ai-icon">🗂️</div>
+            <div class="ai-title">Context</div>
+            <div class="ai-sub">memory · knowledge (RAG) · workflow (skills)</div>
+          </div>
+          <div class="ai-box llm">
+            <div class="ai-icon">🧠</div>
+            <div class="ai-title">LLM</div>
+            <div class="ai-sub">the brain</div>
+          </div>
+          <div class="ai-box">
+            <div class="ai-icon">🔧</div>
+            <div class="ai-title">Tools</div>
+            <div class="ai-sub">e.g. MCP</div>
+          </div>
+        </div>
+      </div>
+      <div class="loop-label">↺ repeat: call tool → update context → decide next step, until task complete</div>
+    </section>
+
+    <section>
+      <h2>Example: Expanding Context with a Skill</h2>
+      <p class="what-it-does">
+        <a href="https://github.com/RConsortium/pharma-skills/tree/main/group-sequential-design" target="_blank">Group Sequential Design skill</a> —
+        given a trial scenario, it designs a group sequential survival-endpoint trial: boundaries, sample size,
+        multiplicity strategy, and a simulation-verified report, through a guided Q&amp;A.
+      </p>
+      <div class="two-col">
+        <div class="col">
+          <h4>Skill structure</h4>
+          <pre><code class="nohighlight">group-sequential-design/
+├── SKILL.md            # Q&A workflow, design steps
+├── reference.md        # design rules, spending fns, alpha recycling
+├── examples.md         # R code by design pattern
+├── post_design.md      # timing checks, verification
+└── scripts/
+    ├── compute_event_prob.R
+    └── gsd_report_template.py</code></pre>
+          <p style="font-size:0.42em; color:#9aa3b2; margin-top:0.6em;">Loaded progressively — only pulled into context when the workflow reaches that step</p>
+        </div>
+        <div class="col">
+          <h4>Output structure</h4>
+          <pre><code class="nohighlight">output/gsd_{disease}_{endpoints}_{date}/
+├── gsd_design.R
+├── gsd_results.json
+├── multiplicity_diagram.png
+├── gsd_verification.R
+├── gsd_verification_log.md
+├── gsd_report.py
+└── gsd_report.docx</code></pre>
+        </div>
+      </div>
+      <p class="demo-link">🎥 <a href="https://drive.google.com/file/d/1fW2CuVbp9XLnt1J6DwzsfKOtgABFPZ8t/view?usp=drive_link" target="_blank">Demo video</a></p>
+    </section>
+
+    <section>
+      <h2>Benchmark Run: Evaluating the Skill</h2>
+      <p class="what-it-does">
+        Any technical addition to an agent — skill, tool, workflow — should be benchmarked with-vs-without, not assumed to help.
+        <a href="https://github.com/RConsortium/pharma-skills/issues/146" target="_blank">21 design scenarios, skill vs. no-skill</a> — overall scorecard (best-with-skill run per scenario):
+      </p>
+      <table style="font-size: 0.5em; margin: 0 auto 0.9em;">
+        <thead><tr><th></th><th>With Skill</th><th>Without Skill</th></tr></thead>
+        <tbody>
+          <tr><td style="text-align:left;">Skill wins</td><td>16</td><td>—</td></tr>
+          <tr><td style="text-align:left;">Ties</td><td>4 (#3, #21, #60, #113)</td><td>—</td></tr>
+          <tr><td style="text-align:left;">No-skill wins</td><td>1 (#139)</td><td>—</td></tr>
+          <tr><td style="text-align:left;">Avg score <span style="color:#9aa3b2;">(excl. #60 trivial)</span></td><td><strong>90%</strong></td><td><strong>62%</strong></td></tr>
+        </tbody>
+      </table>
+      <div class="three-col">
+        <div class="col">
+          <h4>1 · Does it add value?</h4>
+          <div class="stat-sub">16/21 wins, 4 ties, 1 loss (#139 — structural gap, fix in progress)</div>
+        </div>
+        <div class="col">
+          <h4>2 · How good with skill?</h4>
+          <div class="stat-sub">90% avg vs. 62% no-skill, at each scenario's best run</div>
+        </div>
+        <div class="col">
+          <h4>3 · Failure patterns</h4>
+          <ul>
+            <li><strong>P0</strong> four-arm, contribution-of-components design</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>TrialDesignBench</h2>
+      <div class="two-col">
+        <div class="col">
+          <ul style="font-size:0.58em;">
+            <li>Evaluates whether AI agents can <strong>reproduce</strong> or <strong>design</strong> clinical trial statistical designs</li>
+            <li><strong>Benchmark 1</strong> — reproduce, closed-book with SAP/protocol</li>
+            <li><strong>Benchmark 2</strong> — design, no SAP, only context (disease, treatment, regulatory, sponsor)</li>
+          </ul>
+          <p class="demo-link" style="text-align:left; margin-top:0.8em;">🔎 <a href="https://github.com/BBSW-org/TrialDesignBench/issues/4" target="_blank">Full workflow spec</a></p>
+        </div>
+        <div class="col">
+          <a href="assets/benchmark-workflow.svg" target="_blank">
+            <div class="diagram-card">
+              <img src="assets/benchmark-workflow.svg" alt="TrialDesignBench workflow: Step 1 builds prompt and rubrics from a statistician intake form; Step 2 (Benchmark 1) reproduces the design closed-book from the SAP/protocol; Step 3 (Benchmark 2) designs a new trial for the same case without the SAP, using disease, treatment, regulatory, and sponsor context, evaluated by industry statisticians for realism, relevance, and feasibility.">
+            </div>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Building the Benchmark</h2>
+      <div class="three-col">
+        <div class="col">
+          <h4>1 · Intake form</h4>
+          <div class="stat-sub">Statisticians write design questions, and rubrics for a trial</div>
+          <p style="font-size:0.42em; margin-top:0.6em;"><a href="https://huggingface.co/spaces/trialdesignbench/tdb-intake" target="_blank">HuggingFace Space ↗</a></p>
+        </div>
+        <div class="col">
+          <h4>2 · Benchmark review</h4>
+          <div class="stat-sub">QA pass on submitted cases before they enter the benchmark</div>
+          <p style="font-size:0.42em; margin-top:0.6em;"><a href="https://huggingface.co/spaces/trialdesignbench/tdb-intake" target="_blank">HuggingFace Space ↗</a></p>
+        </div>
+        <div class="col">
+          <h4>3 · Evaluation framework</h4>
+          <div class="stat-sub">Runs models against the benchmark, scores outputs against rubrics</div>
+          <p style="font-size:0.42em; margin-top:0.6em;"><a href="https://bbsw-org.github.io/TrialDesignBench/" target="_blank">Built on Harbor ↗</a></p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Example: Question → Rubric → Grade</h2>
+      <p class="what-it-does">KN189 (KEYNOTE-189), P-004 — derivation question:</p>
+      <p style="font-size:0.5em; background:#1e1e1e; border:1px solid #333844; border-radius:8px; padding:0.6em 0.9em; margin:0 0 0.8em;">
+        "What is the total required number of PFS events at its final analysis based on Lachin and Foulkes' method for the variance estimation?"
+      </p>
+      <div class="three-col">
+        <div class="col">
+          <h4>Inputs used</h4>
+          <ul>
+            <li>Target HR = 0.7 <span style="color:#6fcf97;">✓ +1</span></li>
+            <li>Randomization ratio 2:1 <span style="color:#6fcf97;">✓ +1</span></li>
+          </ul>
+        </div>
+        <div class="col">
+          <h4>Calculated value</h4>
+          <ul>
+            <li>PFS events at IA2 ≈468 ±3 <span style="color:#eb5757;">✗ 0</span></li>
+          </ul>
+          <div class="stat-sub">Model derived 472 — out of tolerance</div>
+        </div>
+        <div class="col">
+          <h4>Method</h4>
+          <ul>
+            <li>Fixed design via Lachin-Foulkes <span style="color:#6fcf97;">✓ +2</span></li>
+            <li>L-F uses event fractions, not allocation fractions <span style="color:#eb5757;">✗ 0</span></li>
+          </ul>
+        </div>
+      </div>
+      <p class="demo-link">Model scored <strong>13 / 18</strong> on this prompt</p>
+    </section>
+
+    <section>
+      <h2>Where We Are</h2>
+      <div class="logo-row">
+        <img src="assets/tdb-logo.svg" alt="TrialDesignBench logo" class="tdb-logo">
+      </div>
+      <div class="progress-stat">
+        <div class="progress-num">26 / 100 trials</div>
+        <div class="progress-bar"><div class="progress-fill" style="width:26%"></div></div>
+        <div class="progress-label">toward the target benchmark size</div>
+      </div>
+      <p class="what-it-does" style="text-align:center; margin-top:1em;">
+        <strong>We'd love your help.</strong> Write a test case — question + rubrics — from a protocol/SAP you know well or find interesting, and help stress-test AI on real trial design.
+      </p>
+    </section>
+
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/highlight.js"></script>
+<script>
+  Reveal.initialize({
+    hash: true,
+    slideNumber: 'c/t',
+    plugins: [ RevealHighlight ]
+  });
+</script>
+</body>
+</html>
