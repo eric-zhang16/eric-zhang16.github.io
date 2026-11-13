@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>SkillEvaluator Setup Guide</title>
+<meta name="description" content="Step-by-step install guide for NVIDIA SkillEvaluator on Windows + WSL, with a diagram of Claude Code's harness role vs. NVIDIA's LLM in Tier 3.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;}
+  :root{
+    --bg:#0b0f14; --surface:#121823; --surface-2:#19202c; --border:#2a3344;
+    --fg:#e7edf6; --fg-dim:#8e9ab0;
+    --accent:#5aa9ff; --accent-soft:rgba(90,169,255,.14);
+    --harness:#3ecf8e; --harness-soft:rgba(62,207,142,.14);
+    --verdict:#e3b341; --verdict-soft:rgba(227,179,65,.14);
+    color-scheme: dark;
+  }
+  @media (prefers-color-scheme: light){
+    :root:not([data-theme="dark"]){
+      --bg:#f7f8fb; --surface:#ffffff; --surface-2:#eef1f6; --border:#d9e0ea;
+      --fg:#171e2b; --fg-dim:#5c6780;
+      --accent:#1f6feb; --accent-soft:rgba(31,111,235,.09);
+      --harness:#157a4c; --harness-soft:rgba(21,122,76,.09);
+      --verdict:#93660a; --verdict-soft:rgba(147,102,10,.09);
+      color-scheme: light;
+    }
+  }
+  :root[data-theme="light"]{
+    --bg:#f7f8fb; --surface:#ffffff; --surface-2:#eef1f6; --border:#d9e0ea;
+    --fg:#171e2b; --fg-dim:#5c6780;
+    --accent:#1f6feb; --accent-soft:rgba(31,111,235,.09);
+    --harness:#157a4c; --harness-soft:rgba(21,122,76,.09);
+    --verdict:#93660a; --verdict-soft:rgba(147,102,10,.09);
+    color-scheme: light;
+  }
+  :root[data-theme="dark"]{
+    --bg:#0b0f14; --surface:#121823; --surface-2:#19202c; --border:#2a3344;
+    --fg:#e7edf6; --fg-dim:#8e9ab0;
+    --accent:#5aa9ff; --accent-soft:rgba(90,169,255,.14);
+    --harness:#3ecf8e; --harness-soft:rgba(62,207,142,.14);
+    --verdict:#e3b341; --verdict-soft:rgba(227,179,65,.14);
+    color-scheme: dark;
+  }
+  html,body{margin:0;}
+  body{
+    background:var(--bg); color:var(--fg);
+    font-family:'Inter',ui-sans-serif,system-ui,sans-serif;
+    font-size:15px; line-height:1.55;
+    padding-left:max(16px, env(safe-area-inset-left,0px));
+    padding-right:max(16px, env(safe-area-inset-right,0px));
+  }
+  main{max-width:860px; margin:0 auto; padding-block:36px 64px;}
+  a{color:var(--accent);}
+  .back{display:inline-block; margin-bottom:22px; font-size:.86em; color:var(--fg-dim); text-decoration:none;}
+  .back:hover{color:var(--accent);}
+  h1,h2,h3{font-family:'Space Grotesk',ui-sans-serif,sans-serif; font-weight:700; text-wrap:balance; letter-spacing:-.01em;}
+  h1{font-size:clamp(1.6rem,4vw,2.1rem); margin:0 0 6px;}
+  .lede{color:var(--fg-dim); font-size:1.02rem; max-width:62ch; margin:0 0 36px;}
+  h2{font-size:1.3rem; margin:48px 0 6px; display:flex; align-items:baseline; gap:10px;}
+  h2 .tag{font-family:'JetBrains Mono',monospace; font-size:.62em; font-weight:500; color:var(--fg-dim); border:1px solid var(--border); border-radius:5px; padding:2px 7px; letter-spacing:.02em;}
+  h2 + p.sub{color:var(--fg-dim); margin:0 0 20px; max-width:64ch;}
+  h3{font-size:1rem; margin:0;}
+  code{font-family:'JetBrains Mono',ui-monospace,monospace; font-size:.86em; background:var(--surface-2); border:1px solid var(--border); border-radius:4px; padding:.1em .35em;}
+  pre{background:var(--surface-2); border:1px solid var(--border); border-radius:8px; padding:12px 14px; overflow-x:auto; margin:10px 0 0;}
+  pre code{background:none; border:none; padding:0; font-size:.84em; line-height:1.6; color:var(--fg); white-space:pre;}
+  .comment{color:var(--fg-dim);}
+
+  ol.steps{list-style:none; margin:0; padding:0; counter-reset:step; display:flex; flex-direction:column; gap:14px;}
+  ol.steps > li{counter-increment:step; background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:16px 18px 18px; position:relative;}
+  ol.steps > li::before{
+    content:counter(step); font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:.78rem;
+    position:absolute; top:-10px; left:16px; background:var(--accent); color:#0b0f14;
+    width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+  }
+  ol.steps > li > h3{margin-left:14px;}
+  ol.steps > li > p.note{color:var(--fg-dim); font-size:.88em; margin:8px 0 0;}
+  ol.steps > li > p.why{margin:6px 0 0; font-size:.92em;}
+
+  .gotchas{display:flex; flex-direction:column; gap:10px; margin-top:8px;}
+  .gotcha{border-left:3px solid var(--verdict); background:var(--verdict-soft); border-radius:0 8px 8px 0; padding:10px 14px;}
+  .gotcha .k{font-family:'JetBrains Mono',monospace; font-size:.68rem; font-weight:500; color:var(--verdict); text-transform:uppercase; letter-spacing:.06em;}
+  .gotcha p{margin:4px 0 0; font-size:.92em;}
+
+  figure{margin:28px 0 8px; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:18px 14px 14px;}
+  figure svg{display:block; width:100%; height:auto; max-width:100%; font-family:'Inter',sans-serif;}
+  figcaption{font-size:.86em; color:var(--fg-dim); padding:12px 4px 2px; border-top:1px solid var(--border); margin-top:14px;}
+  .legend{display:flex; flex-wrap:wrap; gap:14px; font-size:.78em; color:var(--fg-dim); padding:0 4px 10px;}
+  .legend span{display:inline-flex; align-items:center; gap:6px;}
+  .legend i{width:11px; height:11px; border-radius:3px; display:inline-block;}
+
+  .part-label{font-family:'JetBrains Mono',monospace; font-size:.72rem; color:var(--fg-dim); letter-spacing:.04em; text-transform:uppercase; margin-bottom:2px;}
+
+  @media (max-width:520px){
+    ol.steps > li{padding-left:14px;}
+  }
+</style>
+</head>
+<body>
+<main>
+  <a class="back" href="../../">&larr; eric-zhang16</a>
+  <div class="part-label">SkillEvaluator · pfs-censoring-recist</div>
+  <h1>SkillEvaluator Setup Guide</h1>
+  <p class="lede">Install NVIDIA's SkillEvaluator, scan and validate a skill, and run its live agent evaluation — with a look at what Claude Code and NVIDIA's hosted LLM each actually do when a "Claude Code" trial runs on a non‑Anthropic key.</p>
+
+  <h2>How the evaluation works</h2>
+  <p class="sub">Three tiers run in sequence. Only the last one needs a live agent and a model behind it — the first two are static checks and embedding similarity.</p>
+
+  <figure>
+    <svg viewBox="0 0 920 150" role="img" aria-label="SkillEvaluator runs Tier 1 static and security checks, then Tier 2 deduplication using NVIDIA embeddings and chat, then Tier 3 live agent evaluation using the Claude Code harness plus an NVIDIA LLM.">
+      <defs>
+        <marker id="ar1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="currentColor"/>
+        </marker>
+      </defs>
+      <rect x="20" y="45" width="260" height="70" rx="9" fill="none" stroke="currentColor" opacity=".55"/>
+      <text x="150" y="75" text-anchor="middle" font-weight="700" font-size="13">Tier 1 — Static &amp; Security</text>
+      <text x="150" y="94" text-anchor="middle" font-size="11" opacity=".65">schema, scanners, quality — no LLM</text>
+
+      <rect x="330" y="45" width="260" height="70" rx="9" fill="none" stroke="currentColor" opacity=".55"/>
+      <text x="460" y="75" text-anchor="middle" font-weight="700" font-size="13">Tier 2 — Deduplication</text>
+      <text x="460" y="94" text-anchor="middle" font-size="11" opacity=".65">NVIDIA embeddings + chat</text>
+
+      <rect x="640" y="45" width="260" height="70" rx="9" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="1.5"/>
+      <text x="770" y="75" text-anchor="middle" font-weight="700" font-size="13">Tier 3 — Live Agent Eval</text>
+      <text x="770" y="94" text-anchor="middle" font-size="11" opacity=".65">Claude Code harness + NVIDIA LLM</text>
+
+      <line x1="282" y1="80" x2="326" y2="80" stroke="currentColor" opacity=".7" marker-end="url(#ar1)"/>
+      <text x="304" y="72" text-anchor="middle" font-size="10" opacity=".6">pass</text>
+      <line x1="592" y1="80" x2="636" y2="80" stroke="currentColor" opacity=".7" marker-end="url(#ar1)"/>
+      <text x="614" y="72" text-anchor="middle" font-size="10" opacity=".6">pass</text>
+    </svg>
+    <figcaption>SkillEvaluator's three tiers run independently and in order; a skill can stop after Tier 1 or Tier 2 and still get a real pass/fail.</figcaption>
+  </figure>
+
+  <figure>
+    <svg viewBox="0 0 960 770" role="img" aria-label="In Tier 3, two matched trials — with the skill mounted and with it withheld — each run inside the Claude Code CLI, which is only the tool-calling harness. Its actual reasoning is rerouted by a local compatibility bridge to NVIDIA Build's Mistral Large 4 model. The same NVIDIA model is then called a second time, in a separate judge role, to grade both transcripts and compute the skill's measured lift.">
+      <defs>
+        <marker id="ar2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="currentColor"/>
+        </marker>
+      </defs>
+
+      <rect x="380" y="20" width="200" height="46" rx="8" fill="none" stroke="currentColor" opacity=".55"/>
+      <text x="480" y="40" text-anchor="middle" font-weight="700" font-size="12">pfs-censoring-recist</text>
+      <text x="480" y="56" text-anchor="middle" font-size="10" opacity=".6">SKILL.md + references/ + scripts/</text>
+
+      <line x1="440" y1="66" x2="175" y2="108" stroke="currentColor" opacity=".55" marker-end="url(#ar2)"/>
+      <line x1="520" y1="66" x2="790" y2="108" stroke="currentColor" opacity=".55" marker-end="url(#ar2)"/>
+
+      <rect x="40" y="110" width="250" height="50" rx="7" fill="none" stroke="currentColor" opacity=".55"/>
+      <text x="165" y="131" text-anchor="middle" font-weight="600" font-size="12">With-skill trial</text>
+      <text x="165" y="147" text-anchor="middle" font-size="10" opacity=".6">skill/ mounted</text>
+
+      <rect x="670" y="110" width="250" height="50" rx="7" fill="none" stroke="currentColor" opacity=".55"/>
+      <text x="795" y="131" text-anchor="middle" font-weight="600" font-size="12">Baseline trial</text>
+      <text x="795" y="147" text-anchor="middle" font-size="10" opacity=".6">skill/ withheld</text>
+
+      <line x1="165" y1="160" x2="165" y2="196" stroke="currentColor" opacity=".55" marker-end="url(#ar2)"/>
+      <line x1="795" y1="160" x2="795" y2="196" stroke="currentColor" opacity=".55" marker-end="url(#ar2)"/>
+
+      <rect x="40" y="198" width="250" height="64" rx="9" fill="var(--harness-soft)" stroke="var(--harness)" stroke-width="1.5"/>
+      <text x="165" y="222" text-anchor="middle" font-weight="700" font-size="12.5">Claude Code CLI</text>
+      <text x="165" y="238" text-anchor="middle" font-size="10" opacity=".65">harness only —</text>
+      <text x="165" y="251" text-anchor="middle" font-size="10" opacity=".65">no model of its own</text>
+
+      <rect x="670" y="198" width="250" height="64" rx="9" fill="var(--harness-soft)" stroke="var(--harness)" stroke-width="1.5"/>
+      <text x="795" y="222" text-anchor="middle" font-weight="700" font-size="12.5">Claude Code CLI</text>
+      <text x="795" y="238" text-anchor="middle" font-size="10" opacity=".65">harness only —</text>
+      <text x="795" y="251" text-anchor="middle" font-size="10" opacity=".65">no model of its own</text>
+
+      <rect x="385" y="210" width="190" height="40" rx="6" fill="none" stroke="currentColor" stroke-dasharray="4 3" opacity=".6"/>
+      <text x="480" y="226" text-anchor="middle" font-size="10.5" opacity=".75">local compatibility bridge</text>
+      <text x="480" y="240" text-anchor="middle" font-size="9.5" opacity=".55">rewrites the model route</text>
+
+      <line x1="290" y1="224" x2="383" y2="224" stroke="currentColor" opacity=".55" marker-end="url(#ar2)"/>
+      <line x1="383" y1="236" x2="290" y2="236" stroke="currentColor" opacity=".55" marker-end="url(#ar2)"/>
+      <text x="336" y="212" text-anchor="middle" font-size="9.5" opacity=".6">request / response</text>
+
+      <line x1="670" y1="224" x2="577" y2="224" stroke="currentColor" opacity=".55" marker-end="url(#ar2)"/>
+      <line x1="577" y1="236" x2="670" y2="236" stroke="currentColor" opacity=".55" marker-end="url(#ar2)"/>
+      <text x="624" y="212" text-anchor="middle" font-size="9.5" opacity=".6">request / response</text>
+
+      <line x1="466" y1="250" x2="466" y2="298" stroke="currentColor" opacity=".55" marker-end="url(#ar2)"/>
+      <line x1="494" y1="298" x2="494" y2="250" stroke="currentColor" opacity=".55" marker-end="url(#ar2)"/>
+      <text x="508" y="278" font-size="9.5" opacity=".6">chat completion</text>
+
+      <rect x="355" y="300" width="250" height="70" rx="9" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="1.5"/>
+      <text x="480" y="324" text-anchor="middle" font-weight="700" font-size="12.5">NVIDIA Build API</text>
+      <text x="480" y="340" text-anchor="middle" font-size="10.5" opacity=".7">Mistral Large 4 —</text>
+      <text x="480" y="353" text-anchor="middle" font-size="10.5" opacity=".7">the agent's real reasoning</text>
+
+      <polyline points="90,262 90,560 353,560" fill="none" stroke="currentColor" opacity=".5" marker-end="url(#ar2)"/>
+      <text x="100" y="440" font-size="10" opacity=".55">final transcript</text>
+
+      <polyline points="870,262 870,560 607,560" fill="none" stroke="currentColor" opacity=".5" marker-end="url(#ar2)"/>
+      <text x="820" y="440" text-anchor="end" font-size="10" opacity=".55">final transcript</text>
+
+      <rect x="355" y="525" width="250" height="70" rx="9" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="1.5"/>
+      <text x="480" y="549" text-anchor="middle" font-weight="700" font-size="12">Judge — NVIDIA Build API</text>
+      <text x="480" y="565" text-anchor="middle" font-size="10" opacity=".7">Mistral Large 4 scores the transcript</text>
+      <text x="480" y="579" text-anchor="middle" font-size="9.5" opacity=".55">accuracy · goal · behavior</text>
+
+      <line x1="480" y1="595" x2="480" y2="628" stroke="currentColor" opacity=".55"/>
+      <line x1="480" y1="628" x2="355" y2="650" stroke="currentColor" opacity=".55" marker-end="url(#ar2)"/>
+      <line x1="480" y1="628" x2="605" y2="650" stroke="currentColor" opacity=".55" marker-end="url(#ar2)"/>
+
+      <rect x="260" y="650" width="190" height="40" rx="20" fill="var(--surface-2)" stroke="currentColor" opacity=".6"/>
+      <text x="355" y="675" text-anchor="middle" font-size="11" opacity=".85">with-skill score</text>
+
+      <rect x="510" y="650" width="190" height="40" rx="20" fill="var(--surface-2)" stroke="currentColor" opacity=".6"/>
+      <text x="605" y="675" text-anchor="middle" font-size="11" opacity=".85">baseline score</text>
+
+      <line x1="355" y1="690" x2="480" y2="712" stroke="currentColor" opacity=".55"/>
+      <line x1="605" y1="690" x2="480" y2="712" stroke="currentColor" opacity=".55" marker-end="url(#ar2)"/>
+
+      <rect x="380" y="715" width="200" height="42" rx="8" fill="var(--verdict-soft)" stroke="var(--verdict)" stroke-width="1.5"/>
+      <text x="480" y="733" text-anchor="middle" font-weight="700" font-size="11.5">skill-lift verdict</text>
+      <text x="480" y="747" text-anchor="middle" font-size="9.5" opacity=".7">pass / fail / inconclusive</text>
+    </svg>
+    <div class="legend">
+      <span><i style="background:var(--harness-soft); border:1.5px solid var(--harness);"></i>Claude Code — harness/orchestration only</span>
+      <span><i style="background:var(--accent-soft); border:1.5px solid var(--accent);"></i>NVIDIA Build API — the actual LLM, in two separate roles</span>
+      <span><i style="background:var(--verdict-soft); border:1.5px solid var(--verdict);"></i>result</span>
+    </div>
+    <figcaption>Both trial arms share the exact same Claude Code harness and the exact same NVIDIA model; the only thing that differs between them is whether <code>skill/</code> is mounted. "Claude Code" here never calls Anthropic — a local bridge reroutes every request to NVIDIA Build, and that same model is called again afterward, in a separate judge role, to grade the two transcripts.</figcaption>
+  </figure>
+
+  <h2>Part 1 <span class="tag">native Windows</span></h2>
+  <p class="sub">Tiers 1 and 2 need no Linux layer — they ran fine directly on Windows once the scanners were on <code>PATH</code>.</p>
+  <ol class="steps">
+    <li>
+      <h3>Install <code>uv</code></h3>
+      <pre><code>py -m pip install --user uv</code></pre>
+      <p class="note">Your system Python can be newer than SkillEvaluator's declared support (3.12–3.14) — that's fine, <code>uv</code> provisions its own pinned interpreter per command.</p>
+    </li>
+    <li>
+      <h3>Clone the repo</h3>
+      <pre><code>git clone --depth 1 https://github.com/NVIDIA/SkillEvaluator.git
+cd SkillEvaluator</code></pre>
+    </li>
+    <li>
+      <h3>First run bootstraps everything</h3>
+      <pre><code>py -m uv run --python 3.13 skillevaluator --help</code></pre>
+      <p class="note">Pin <code>--python 3.13</code> explicitly — it's the version this release targets.</p>
+    </li>
+    <li>
+      <h3>Install the Tier 1 scanners</h3>
+      <pre><code><span class="comment"># SkillSpector (security)</span>
+py -m uv tool install --python 3.13 ^
+  https://github.com/NVIDIA/SkillSpector/releases/download/v2.13.3/skillspector-2.13.3-py3-none-any.whl
+
+<span class="comment"># Gitleaks (secrets) — no installer, just the release binary</span>
+curl -sL -o gitleaks.zip ^
+  https://github.com/gitleaks/gitleaks/releases/download/v8.30.1/gitleaks_8.30.1_windows_x64.zip
+<span class="comment"># unzip gitleaks.exe into the same folder uv used, e.g. %USERPROFILE%\.local\bin</span></code></pre>
+      <p class="why">Pin <code>--python 3.13</code> here too: SkillSpector's <code>yara-python</code> dependency ships no prebuilt wheel for newer Pythons on Windows, so the default interpreter fails to build it from source.</p>
+    </li>
+    <li>
+      <h3>Put the tools on <code>PATH</code></h3>
+      <pre><code>$env:PATH = "$env:USERPROFILE\.local\bin;$env:PATH"</code></pre>
+      <p class="note">Every new shell needs this — <code>uv tool install</code> warns about it but doesn't fix it for you.</p>
+    </li>
+    <li>
+      <h3>Run Tier 1</h3>
+      <pre><code>py -m uv run --python 3.13 skillevaluator validate "&lt;path-to-skill&gt;" -r cli</code></pre>
+      <p class="note">Exit 0 and "9/9 checks passed" means schema, security, PII, license, and quality all cleared.</p>
+    </li>
+    <li>
+      <h3>Get a free NVIDIA Build key</h3>
+      <p class="note">build.nvidia.com → sign in → open any model page → <strong>Get API Key</strong>. One key covers every model.</p>
+    </li>
+    <li>
+      <h3>Run Tier 2</h3>
+      <pre><code>$env:SKILL_EVAL_LLM_PROVIDER = "nv_build"
+$env:NVIDIA_API_KEY = "nvapi-..."
+py -m uv run --python 3.13 --extra tier2 skillevaluator tier2 "&lt;path-to-skill&gt;"</code></pre>
+      <p class="note">Chunks the skill's files, embeds them, and clusters for repeated/overlapping guidance — embeddings only, no live agent.</p>
+    </li>
+  </ol>
+
+  <h2>Part 2 <span class="tag">WSL2</span></h2>
+  <p class="sub">Tier 3's local live-agent mode is Linux-only. On Windows, <code>doctor</code> fails outright with <em>"Native Windows local mode is unsupported."</em></p>
+  <ol class="steps">
+    <li>
+      <h3>Install WSL2 — from an elevated shell</h3>
+      <pre><code><span class="comment"># PowerShell, Run as Administrator</span>
+wsl --install</code></pre>
+      <p class="note">Reboot when it asks. If <code>wsl -l -v</code> still shows no distro afterward, the platform installed but Ubuntu didn't — run <code>wsl --install -d Ubuntu</code> next.</p>
+    </li>
+    <li>
+      <h3>Create the Ubuntu user — interactively, in a real window</h3>
+      <p class="note">Open the <strong>Ubuntu</strong> app from the Start menu yourself and finish the <code>Enter new UNIX username</code> / password prompts there.</p>
+      <p class="why">Running the install from a script or non-interactive shell leaves it stuck at <em>"Waiting for OOBE command to complete"</em> forever — the first-boot prompt has no keyboard to read from.</p>
+    </li>
+    <li>
+      <h3>Install <code>uv</code> inside WSL — no <code>sudo</code></h3>
+      <pre><code>curl -LsSf https://astral.sh/uv/install.sh | sh</code></pre>
+    </li>
+    <li>
+      <h3>Clone the repo again, inside WSL</h3>
+      <pre><code>mkdir -p ~/claude &amp;&amp; cd ~/claude
+git clone --depth 1 https://github.com/NVIDIA/SkillEvaluator.git</code></pre>
+      <p class="note">WSL's filesystem is separate from Windows' — the Windows checkout isn't reachable the way <code>uv run</code> needs it.</p>
+    </li>
+    <li>
+      <h3>Install Node.js and the Claude Code CLI — no <code>sudo</code></h3>
+      <pre><code>curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
+source ~/.bashrc
+nvm install --lts
+npm install -g @anthropic-ai/claude-code</code></pre>
+      <p class="why">Ubuntu's default <code>.bashrc</code> returns immediately for non-interactive shells, before it reaches the lines that load <code>nvm</code>. Any scripted call needs <code>source "$HOME/.nvm/nvm.sh"</code> explicitly — don't rely on <code>.bashrc</code> having run.</p>
+    </li>
+    <li>
+      <h3>Install the <code>tier3</code> extra and check readiness</h3>
+      <pre><code>cd ~/claude/SkillEvaluator
+export SKILL_EVAL_LLM_PROVIDER=nv_build
+export NVIDIA_API_KEY="nvapi-..."
+uv run --python 3.13 --extra tier3 skillevaluator doctor \
+  --env-mode local --agents claude-code</code></pre>
+      <p class="note">Every row should read <code>pass</code> — provider, credential, agent, and local prerequisite.</p>
+    </li>
+    <li>
+      <h3>Pick a model your key can actually call</h3>
+      <pre><code>curl -s -H "Authorization: Bearer $NVIDIA_API_KEY" \
+  https://integrate.api.nvidia.com/v1/models</code></pre>
+      <p class="why">The provider's advertised default can be listed in the catalog yet still 404 on an actual chat request for a given key — catalog visibility isn't proof of working access. Confirm with a real call before trusting the default: <code>uv run --python 3.13 --extra tier3 skillevaluator doctor --tier 2 --verify-models</code> (look at the <code>Deduplication model</code> row).</p>
+    </li>
+    <li>
+      <h3>Set the model, exactly as the catalog spells it</h3>
+      <pre><code>export SKILL_EVAL_LLM_MODEL="mistralai/mistral-large-4-1t-a52b"</code></pre>
+      <p class="why">Only NVIDIA's own entries carry an <code>nvidia/</code> prefix in the catalog ID. Every other publisher's models use their own namespace as-is (<code>mistralai/…</code>, <code>deepseek-ai/…</code>, <code>ai21labs/…</code>) — adding <code>nvidia/</code> in front of those produces a model string the endpoint doesn't recognize.</p>
+    </li>
+    <li>
+      <h3>Run Tier 3</h3>
+      <pre><code>uv run --python 3.13 --extra tier3 skillevaluator tier3 \
+  "&lt;path-to-skill&gt;" --agents claude-code --env-mode local \
+  --agent-model claude-code=mistralai/mistral-large-4-1t-a52b</code></pre>
+      <p class="note">Local mode runs the agent directly on the WSL host rather than in a container — fine for your own trusted skills, not for third-party ones (use <code>--env-mode docker</code> there instead).</p>
+    </li>
+  </ol>
+
+  <h2>Gotchas worth knowing</h2>
+  <div class="gotchas">
+    <div class="gotcha"><div class="k">PATH resets</div><p>Both <code>.local/bin</code> (Windows) and the scanner binaries need re-adding to <code>PATH</code> in every fresh shell — SkillEvaluator doesn't persist it for you.</p></div>
+    <div class="gotcha"><div class="k">model naming</div><p>Don't prepend <code>nvidia/</code> to a non-NVIDIA catalog ID. Copy the ID exactly as <code>/v1/models</code> returns it.</p></div>
+    <div class="gotcha"><div class="k">catalog ≠ access</div><p>A model showing up in the catalog listing doesn't mean your key can call it — verify with <code>doctor --verify-models</code>, which sends a real request, before spending a full Tier 3 run finding out.</p></div>
+    <div class="gotcha"><div class="k">free-tier limits</div><p>NVIDIA Build's free key is commonly reported around 30–40 requests/minute, account-wide across every model, and scoped to dev/test use rather than production.</p></div>
+    <div class="gotcha"><div class="k">local mode is experimental</div><p>NVIDIA's own docs flag it as intended for trusted skills and workspaces — reach for Docker instead when evaluating anything you didn't write yourself.</p></div>
+  </div>
+</main>
+</body>
+</html>
