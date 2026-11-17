@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>gsDose: Seamless Phase 2/3 Design with Dose Selection</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/night.css" id="theme">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/monokai.css">
+<style>
+  .reveal h2 { font-size: 1.35em; margin-bottom: 0.4em; }
+  .what-it-does {
+    font-size: 0.62em;
+    color: #d8dee9;
+    text-align: left;
+    margin: 0.6em 0 1em;
+  }
+  .two-col {
+    display: flex;
+    gap: 1.8em;
+    text-align: left;
+  }
+  .two-col .col { flex: 1; }
+  .two-col h4 {
+    font-size: 0.65em;
+    color: #7aa2f7;
+    margin: 0 0 0.35em;
+  }
+  .two-col ul {
+    margin: 0;
+    padding-left: 1em;
+    font-size: 0.52em;
+    line-height: 1.55;
+  }
+  .two-col pre {
+    font-size: 0.42em;
+    width: 100%;
+    box-shadow: none;
+  }
+  .demo-link {
+    margin-top: 1em;
+    font-size: 0.55em;
+    text-align: center;
+  }
+  .three-col {
+    display: flex;
+    gap: 1.1em;
+    text-align: left;
+    margin-top: 0.8em;
+  }
+  .three-col .col {
+    flex: 1;
+    background: #1e1e1e;
+    border: 1px solid #333844;
+    border-radius: 10px;
+    padding: 0.8em 0.9em;
+  }
+  .three-col h4 {
+    font-size: 0.55em;
+    color: #7aa2f7;
+    margin: 0 0 0.4em;
+  }
+  .three-col .stat-sub {
+    font-size: 0.42em;
+    color: #9aa3b2;
+    margin-top: 0.2em;
+  }
+  .three-col ul {
+    margin: 0;
+    padding-left: 1em;
+    font-size: 0.42em;
+    line-height: 1.55;
+  }
+  .diagram-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 0.4em;
+    box-shadow: 0 0 20px rgba(0,0,0,0.35);
+  }
+  .diagram-card img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 6px;
+    cursor: zoom-in;
+  }
+  .flow-hyp-list { display: flex; gap: 0.5em; justify-content: center; flex-wrap: nowrap; margin: 0.4em 0 0.2em; }
+  .flow-hyp-item {
+    background: #1e1e1e; border: 1px solid #333844; border-radius: 8px;
+    padding: 0.3em 0.6em; font-size: 0.32em; text-align: left; white-space: nowrap;
+  }
+  .flow-hyp-item.relevant {
+    background: rgba(122,162,247,0.14); border: 1.6px solid #7aa2f7;
+    box-shadow: 0 0 10px rgba(122,162,247,0.3);
+  }
+  .flow-outer { position: relative; margin: 0.6em auto 0; width: 900px; }
+  .flow-reset {
+    position: absolute; bottom: 8px; right: 8px; z-index: 60;
+    font-size: 0.42em; background: #2a2e3a; color: #d8dee9;
+    border: 1px solid #444b5c; border-radius: 6px;
+    padding: 0.35em 0.9em; cursor: pointer;
+  }
+  .flow-reset:hover { background: #333a49; }
+  .flow-wrap {
+    position: relative; width: 900px; max-height: 440px;
+    overflow-y: auto; overflow-x: hidden; border-radius: 12px;
+  }
+  .flow-stage {
+    position: relative;
+    width: 900px; height: 730px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.35);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    color: #222;
+  }
+  .flow-arm-label {
+    position: absolute; left: 8px; width: 88px;
+    font-size: 13px; font-weight: 700; color: #222;
+  }
+  .flow-arm-label .sel { display: block; font-size: 9.5px; font-weight: 600; color: #2a9d8f; }
+  .flow-note-sm {
+    position: absolute; top: 54px; transform: translateX(-50%);
+    font-size: 10px; color: #888; white-space: nowrap;
+  }
+  .flow-tp-line {
+    position: absolute; top: 44px; width: 0; height: 182px;
+    border-left: 2px dashed;
+  }
+  .flow-tp-line.ia1 { border-color: #c0614b; }
+  .flow-tp-line.ia2, .flow-tp-line.fa { border-color: #2a9d8f; }
+  .flow-tp-label {
+    position: absolute; top: 28px; transform: translateX(-50%);
+    font-size: 11px; font-weight: 700; white-space: nowrap;
+  }
+  .flow-tp-label.ia1 { color: #c0614b; }
+  .flow-tp-label.ia2, .flow-tp-label.fa { color: #2a9d8f; }
+  .flow-empty {
+    position: absolute; border: 1px dashed #ccc; border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9px; color: #aaa; font-style: italic;
+  }
+  .flow-divider {
+    position: absolute; left: 0; top: 234px; width: 900px;
+    text-align: center; font-size: 10px; color: #888;
+  }
+  .flow-zone-cap { position: absolute; font-size: 10.5px; color: #555; }
+  .flow-zone-cap strong { color: #222; }
+  .flow-vs {
+    position: absolute; font-size: 10px; font-weight: 700;
+    color: #888; text-align: center;
+  }
+  .flow-zone { position: absolute; border: 1.8px dashed #999; border-radius: 8px; background: rgba(0,0,0,0.02); }
+  .flow-zone.z1 { border-color: #ba7517; }
+  .flow-zone.z2 { border-color: #2a9d8f; }
+  .flow-box {
+    position: absolute; height: 36px; border-radius: 6px;
+    font-size: 11px; font-weight: 600; text-align: center; line-height: 1.15;
+    padding-top: 3px; box-sizing: border-box; cursor: grab;
+    user-select: none; touch-action: none;
+  }
+  .flow-box .flow-box-sub { display: block; font-size: 9px; font-weight: 500; opacity: 0.8; }
+  .flow-box.compact {
+    height: 20px; padding-top: 0; display: flex; align-items: center;
+    justify-content: center; font-size: 9.5px; white-space: nowrap;
+  }
+  .flow-box.chip {
+    height: 18px; padding-top: 0; display: flex; align-items: center;
+    justify-content: center; font-size: 8px; white-space: nowrap; z-index: 5;
+  }
+  .flow-box.dragging { cursor: grabbing; z-index: 50; box-shadow: 0 4px 14px rgba(0,0,0,0.3); }
+  .flow-box.chunk-pre { background: rgba(186,117,23,0.22); border: 1.2px solid #ba7517; color: #6b4a0e; }
+  .flow-box.chunk-pre.selected { border-width: 1.8px; }
+  .flow-box.chunk-post { background: rgba(42,157,143,0.22); border: 1.6px solid #2a9d8f; color: #1d6358; }
+  .flow-bar { position: absolute; height: 20px; border-radius: 6px; box-sizing: border-box; }
+  .flow-bar.pre { background: rgba(186,117,23,0.22); border: 1.2px solid #ba7517; }
+  .flow-bar.post { background: rgba(42,157,143,0.22); border: 1.6px solid #2a9d8f; }
+  .flow-box.chunk-combo { background: rgba(124,110,232,0.18); border: 1.6px solid #7c6ee8; color: #4a3d8f; }
+  #flowStageFixed .flow-box { cursor: default; }
+  .gap2-wrap { width: 900px; margin: 0.5em auto 0; }
+  .gap2-stage {
+    position: relative; width: 900px; height: 500px;
+    background: #fff; border-radius: 12px; box-shadow: 0 0 20px rgba(0,0,0,0.35);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    color: #222; overflow: hidden;
+  }
+  .gap2-pill {
+    position: absolute; border-radius: 6px; display: flex; align-items: center;
+    justify-content: center; font-weight: 700; font-size: 12px; text-align: center;
+    box-sizing: border-box; padding: 0 6px;
+  }
+  .gap2-bar { position: absolute; border-radius: 3px; }
+  .gap2-box { position: absolute; border-radius: 8px; box-sizing: border-box; }
+  .gap2-label {
+    position: absolute; font-weight: 700; font-size: 13px; display: flex; align-items: center;
+  }
+  .gap2-label .sq { display: inline-block; width: 6px; height: 24px; border-radius: 2px; margin-right: 10px; }
+  .gap2-item {
+    position: absolute; font-size: 11px; color: #2c3e5c; display: flex; align-items: center;
+  }
+  .gap2-item .sq { display: inline-block; width: 14px; height: 18px; border-radius: 2px; margin-right: 8px; flex-shrink: 0; }
+  .gap2-strip {
+    position: absolute; border-radius: 8px 8px 0 0; color: #fff; font-weight: 700; font-size: 12px;
+    display: flex; align-items: center; justify-content: center; text-align: center; padding: 0 6px; box-sizing: border-box;
+  }
+  .gap2-stat { position: absolute; font-weight: 700; text-align: center; }
+  .gap2-outcome { position: absolute; font-weight: 700; font-size: 12px; text-align: center; line-height: 1.5; display: flex; align-items: center; justify-content: center; padding: 0 10px; box-sizing: border-box; }
+  .gap2-arrow { position: absolute; font-size: 22px; color: #2a9d8f; }
+  .flow-op { position: absolute; font-size: 10px; font-weight: 700; color: #888; text-align: center; }
+  .flow-wlabel { position: absolute; font-size: 9px; color: #7c6ee8; font-style: italic; text-align: center; }
+  .result-table {
+    font-size: 0.5em;
+    margin: 0.6em auto;
+    border-collapse: collapse;
+  }
+  .result-table th, .result-table td {
+    padding: 0.35em 0.7em;
+    border-bottom: 1px solid #333844;
+  }
+  .result-table th { color: #7aa2f7; }
+  .yes { color: #eb5757; font-weight: 700; }
+  .no { color: #9aa3b2; }
+  .step-label {
+    display: inline-block;
+    font-size: 0.4em;
+    font-weight: 700;
+    color: #101522;
+    background: #7aa2f7;
+    border-radius: 6px;
+    padding: 0.2em 0.7em;
+    margin-bottom: 0.5em;
+  }
+  .refs {
+    font-size: 0.5em;
+    text-align: left;
+    line-height: 1.8;
+  }
+  .refs a { color: #7aa2f7; }
+</style>
+</head>
+<body>
+<div class="reveal">
+  <div class="slides">
+
+    <section>
+      <h2>Seamless Phase 2/3 Design with Dose Selection</h2>
+      <p>A Multi-Arm Multi-Stage Group Sequential Design for Oncology Survival Trials</p>
+      <p><small>Eric Zhang &nbsp;&middot;&nbsp; Eikon Therapeutics</small></p>
+      <p style="font-size:0.42em; color:#9aa3b2; margin-top:0.8em;">Based on Zhang, E. (P.) &amp; Jin, M. (2025). <em>A Multi-Arm Multi-Stage Group Sequential Phase 2/3 Design with Dose Selection for Oncology Trials.</em> Statistics in Biopharmaceutical Research.</p>
+    </section>
+
+    <section>
+      <h2 style="font-size:0.75em;">Phase 2 and Phase 3 in One Study with One Protocol</h2>
+      <a href="assets/seamless-design-schematic.svg" target="_blank">
+        <div class="diagram-card">
+          <img src="assets/seamless-design-schematic.svg" alt="Seamless design schematic for an OS trial: Low dose, High dose, and control enroll in Phase 2, up to IA1 where High dose is selected; Low-dose patients already enrolled are still followed for events but no new patients enroll on that arm. High dose and control continue enrolling into Phase 3, which is tested for confirmatory efficacy at IA2 and the final analysis (FA).">
+
+        </div>
+      </a>
+    </section>
+
+    <section>
+      <h2>Constructing the Statistical Testing</h2>
+      <p class="what-it-does" style="margin-bottom:0.2em; font-size:0.42em;">
+        Three hypotheses are in play:
+      </p>
+      <div class="flow-hyp-list">
+        <div class="flow-hyp-item"><strong>H1</strong> &mdash; Low dose vs. Control</div>
+        <div class="flow-hyp-item relevant"><strong>H2</strong> &mdash; High dose vs. Control</div>
+        <div class="flow-hyp-item relevant"><strong>H1 &cap; H2</strong> &mdash; Low dose &cap; High dose vs. Control</div>
+      </div>
+      <p class="what-it-does" style="margin:0.3em 0 0.2em; font-size:0.42em;">
+        Closed testing: reject <strong>H2 overall</strong> only if both <strong>H2</strong> and <strong>H1 &cap; H2</strong>
+        are rejected at the design's &alpha; = 0.025.
+      </p>
+
+      <div class="flow-outer">
+        <button class="flow-reset" type="button">Reset layout</button>
+        <div class="flow-wrap">
+          <div class="flow-stage" id="flowStage">
+
+            <div class="flow-note-sm" style="left:260px;">1:1:1 randomization</div>
+            <div class="flow-note-sm" style="left:500px;">1:1 randomization</div>
+
+            <div class="flow-tp-line ia1" style="left:380px;"></div>
+            <div class="flow-tp-label ia1" style="left:380px;">IA1: dose selection</div>
+            <div class="flow-tp-line ia2" style="left:600px;"></div>
+            <div class="flow-tp-label ia2" style="left:600px;">IA2: confirmatory</div>
+            <div class="flow-tp-line fa" style="left:820px;"></div>
+            <div class="flow-tp-label fa" style="left:820px;">FA: confirmatory</div>
+
+            <div class="flow-arm-label" style="top:74px;">Low Dose</div>
+            <div class="flow-bar pre" style="left:140px; top:70px; width:460px;"></div>
+            <div class="flow-bar pre" style="left:600px; top:70px; width:220px;"></div>
+            <div class="flow-box chip chunk-pre" data-left="145" data-top="71" style="left:145px; top:71px; width:100px;">Low &middot; C1 &le;IA2</div>
+            <div class="flow-box chip chunk-pre" data-left="605" data-top="71" style="left:605px; top:71px; width:100px;">Low &middot; C1 IA2&rarr;FA</div>
+            <div class="flow-empty" style="left:380px; top:92px; width:440px; height:20px;">Low Dose &mdash; no Cohort 2 (dropped at IA1)</div>
+
+            <div class="flow-arm-label" style="top:128px;">High Dose &#9733;</div>
+            <div class="flow-bar pre" style="left:140px; top:124px; width:460px;"></div>
+            <div class="flow-bar pre" style="left:600px; top:124px; width:220px;"></div>
+            <div class="flow-bar post" style="left:380px; top:146px; width:440px;"></div>
+            <div class="flow-box chip chunk-pre" data-left="145" data-top="125" style="left:145px; top:125px; width:100px;">High &middot; C1 &le;IA2</div>
+            <div class="flow-box chip chunk-pre" data-left="605" data-top="125" style="left:605px; top:125px; width:100px;">High &middot; C1 IA2&rarr;FA</div>
+            <div class="flow-box chip chunk-post" data-left="385" data-top="147" style="left:385px; top:147px; width:100px;">High &middot; C2 &le;FA</div>
+
+            <div class="flow-arm-label" style="top:182px;">Control</div>
+            <div class="flow-bar pre" style="left:140px; top:178px; width:460px;"></div>
+            <div class="flow-bar pre" style="left:600px; top:178px; width:220px;"></div>
+            <div class="flow-bar post" style="left:380px; top:200px; width:440px;"></div>
+            <div class="flow-box chip chunk-pre" data-left="145" data-top="179" style="left:145px; top:179px; width:100px;">Ctrl &middot; C1 &le;IA2</div>
+            <div class="flow-box chip chunk-pre" data-left="145" data-top="179" style="left:145px; top:179px; width:100px;">Ctrl &middot; C1 &le;IA2</div>
+            <div class="flow-box chip chunk-pre" data-left="605" data-top="179" style="left:605px; top:179px; width:100px;">Ctrl &middot; C1 IA2&rarr;FA</div>
+            <div class="flow-box chip chunk-pre" data-left="605" data-top="179" style="left:605px; top:179px; width:100px;">Ctrl &middot; C1 IA2&rarr;FA</div>
+            <div class="flow-box chip chunk-post" data-left="385" data-top="201" style="left:385px; top:201px; width:100px;">Ctrl &middot; C2 &le;FA</div>
+
+            <div class="flow-divider">&darr; drag a small chip into each matching blank below to build each log-rank piece &darr;</div>
+
+            <div class="flow-zone-cap" style="left:20px; top:250px;"><strong>Log-rank pieces for H2</strong> (High dose vs. Control):</div>
+            <div class="flow-zone-cap" style="left:20px; top:264px;"><strong>&#9312;</strong> Cohort 1, up to IA2</div>
+            <div class="flow-zone z1" style="left:20px; top:278px; width:100px; height:18px;"></div>
+            <div class="flow-vs" style="left:20px; top:298px; width:100px;">vs</div>
+            <div class="flow-zone z1" style="left:20px; top:312px; width:100px; height:18px;"></div>
+            <div class="flow-vs" style="left:125px; top:296px; width:15px;">=</div>
+            <div class="flow-box chunk-pre compact" data-left="140" data-top="296" style="left:140px; top:296px; width:90px;">Z<sub>H2,1</sub></div>
+            <div class="flow-box chunk-pre compact" data-left="140" data-top="296" style="left:140px; top:296px; width:90px;">Z<sub>H2,1</sub></div>
+
+            <div class="flow-zone-cap" style="left:300px; top:264px;"><strong>&#9313;</strong> Cohort 1, IA2 &rarr; FA</div>
+            <div class="flow-zone z1" style="left:300px; top:278px; width:100px; height:18px;"></div>
+            <div class="flow-vs" style="left:300px; top:298px; width:100px;">vs</div>
+            <div class="flow-zone z1" style="left:300px; top:312px; width:100px; height:18px;"></div>
+            <div class="flow-vs" style="left:405px; top:296px; width:15px;">=</div>
+            <div class="flow-box chunk-pre compact" data-left="420" data-top="296" style="left:420px; top:296px; width:90px;">Z<sub>H2,2</sub></div>
+            <div class="flow-box chunk-pre compact" data-left="420" data-top="296" style="left:420px; top:296px; width:90px;">Z<sub>H2,2</sub></div>
+
+            <div class="flow-zone-cap" style="left:580px; top:264px;"><strong>&#9314;</strong> Cohort 2, up to FA</div>
+            <div class="flow-zone z2" style="left:580px; top:278px; width:100px; height:18px;"></div>
+            <div class="flow-vs" style="left:580px; top:298px; width:100px;">vs</div>
+            <div class="flow-zone z2" style="left:580px; top:312px; width:100px; height:18px;"></div>
+            <div class="flow-vs" style="left:685px; top:296px; width:15px;">=</div>
+            <div class="flow-box chunk-post compact" data-left="700" data-top="296" style="left:700px; top:296px; width:90px;">Z<sub>H2</sub></div>
+            <div class="flow-box chunk-post compact" data-left="700" data-top="296" style="left:700px; top:296px; width:90px;">Z<sub>H2</sub></div>
+
+            <div class="flow-zone-cap" style="left:20px; top:350px;"><strong>Log-rank pieces for H1</strong> (Low dose vs. Control &mdash; no Cohort 2, dropped at IA1):</div>
+            <div class="flow-zone-cap" style="left:20px; top:364px;"><strong>&#9315;</strong> Cohort 1, up to IA2</div>
+            <div class="flow-zone z1" style="left:20px; top:378px; width:100px; height:18px;"></div>
+            <div class="flow-vs" style="left:20px; top:398px; width:100px;">vs</div>
+            <div class="flow-zone z1" style="left:20px; top:412px; width:100px; height:18px;"></div>
+            <div class="flow-vs" style="left:125px; top:396px; width:15px;">=</div>
+            <div class="flow-box chunk-pre compact" data-left="140" data-top="396" style="left:140px; top:396px; width:90px;">Z<sub>H1,1</sub></div>
+
+            <div class="flow-zone-cap" style="left:300px; top:364px;"><strong>&#9316;</strong> Cohort 1, IA2 &rarr; FA</div>
+            <div class="flow-zone z1" style="left:300px; top:378px; width:100px; height:18px;"></div>
+            <div class="flow-vs" style="left:300px; top:398px; width:100px;">vs</div>
+            <div class="flow-zone z1" style="left:300px; top:412px; width:100px; height:18px;"></div>
+            <div class="flow-vs" style="left:405px; top:396px; width:15px;">=</div>
+            <div class="flow-box chunk-pre compact" data-left="420" data-top="396" style="left:420px; top:396px; width:90px;">Z<sub>H1,2</sub></div>
+
+            <div style="position:absolute; left:20px; top:436px; width:860px; height:0; border-top:1.5px solid #ccc;"></div>
+
+            <div class="flow-zone-cap" style="left:20px; top:450px;"><strong>H2 &mdash; combination tests</strong> (inverse-normal unless noted):</div>
+            <div class="flow-zone-cap" style="left:20px; top:464px;"><strong>&#9317;</strong> Cohort 1 (w)</div>
+            <div class="flow-zone" style="left:20px; top:478px; width:90px; height:18px;"></div>
+            <div class="flow-op" style="left:115px; top:478px; width:15px;">+</div>
+            <div class="flow-zone" style="left:135px; top:478px; width:90px; height:18px;"></div>
+            <div class="flow-wlabel" style="left:230px; top:479px; width:35px;">(w)</div>
+            <div class="flow-op" style="left:270px; top:478px; width:15px;">=</div>
+            <div class="flow-box chunk-combo compact" data-left="290" data-top="478" style="left:290px; top:478px; width:80px;">Z<sub>1,H2</sub></div>
+
+            <div class="flow-zone-cap" style="left:410px; top:464px;"><strong>&#9318;</strong> Overall (h): cohort 1 + cohort 2</div>
+            <div class="flow-zone" style="left:410px; top:478px; width:90px; height:18px;"></div>
+            <div class="flow-op" style="left:505px; top:478px; width:15px;">+</div>
+            <div class="flow-zone" style="left:525px; top:478px; width:90px; height:18px;"></div>
+            <div class="flow-wlabel" style="left:620px; top:479px; width:35px;">(h)</div>
+            <div class="flow-op" style="left:660px; top:478px; width:15px;">=</div>
+            <div class="flow-box chunk-combo compact" data-left="680" data-top="478" style="left:680px; top:478px; width:80px;">Z(H2)</div>
+            <div class="flow-wlabel" style="left:765px; top:478px; width:120px; text-align:left; font-size:11px;">under H0: <strong style="font-size:13px; color:#4a3d8f;">&sim; N(0,1)</strong></div>
+
+            <div class="flow-zone-cap" style="left:20px; top:512px;"><strong>H1 &cap; H2 &mdash; Dunnett combination</strong> (per testing stage, across the two doses):</div>
+            <div class="flow-zone-cap" style="left:20px; top:526px;"><strong>&#9319;</strong> Stage 1 (&le;IA2)</div>
+            <div class="flow-zone" style="left:20px; top:540px; width:90px; height:18px;"></div>
+            <div class="flow-op" style="left:20px; top:560px; width:90px;">+</div>
+            <div class="flow-zone" style="left:20px; top:574px; width:90px; height:18px;"></div>
+            <div class="flow-wlabel" style="left:125px; top:558px; width:60px;">(Dunnett)</div>
+            <div class="flow-op" style="left:190px; top:558px; width:15px;">=</div>
+            <div class="flow-box chunk-combo compact" data-left="210" data-top="558" style="left:210px; top:558px; width:50px;">D<sub>1</sub></div>
+
+            <div class="flow-zone-cap" style="left:410px; top:526px;"><strong>&#9320;</strong> Stage 2 (IA2&rarr;FA)</div>
+            <div class="flow-zone" style="left:410px; top:540px; width:90px; height:18px;"></div>
+            <div class="flow-op" style="left:410px; top:560px; width:90px;">+</div>
+            <div class="flow-zone" style="left:410px; top:574px; width:90px; height:18px;"></div>
+            <div class="flow-wlabel" style="left:515px; top:558px; width:60px;">(Dunnett)</div>
+            <div class="flow-op" style="left:580px; top:558px; width:15px;">=</div>
+            <div class="flow-box chunk-combo compact" data-left="600" data-top="558" style="left:600px; top:558px; width:50px;">D<sub>2</sub></div>
+
+            <div class="flow-zone-cap" style="left:20px; top:608px;"><strong>H1 &cap; H2 &mdash; combination tests</strong> (inverse-normal: stages, then cohort 1 + cohort 2):</div>
+            <div class="flow-zone-cap" style="left:20px; top:622px;"><strong>&#9321;</strong> Cohort 1 (w)</div>
+            <div class="flow-zone" style="left:20px; top:636px; width:50px; height:18px;"></div>
+            <div class="flow-op" style="left:75px; top:636px; width:15px;">+</div>
+            <div class="flow-zone" style="left:95px; top:636px; width:50px; height:18px;"></div>
+            <div class="flow-wlabel" style="left:150px; top:637px; width:35px;">(w)</div>
+            <div class="flow-op" style="left:190px; top:636px; width:15px;">=</div>
+            <div class="flow-box chunk-combo compact" data-left="210" data-top="636" style="left:210px; top:636px; width:70px;">Z<sub>1,&cap;</sub></div>
+
+            <div class="flow-zone-cap" style="left:410px; top:622px;"><strong>&#9322;</strong> Overall (h): cohort 1 + cohort 2</div>
+            <div class="flow-zone" style="left:410px; top:636px; width:70px; height:18px;"></div>
+            <div class="flow-op" style="left:485px; top:636px; width:15px;">+</div>
+            <div class="flow-zone" style="left:505px; top:636px; width:90px; height:18px;"></div>
+            <div class="flow-wlabel" style="left:600px; top:637px; width:35px;">(h)</div>
+            <div class="flow-op" style="left:640px; top:636px; width:15px;">=</div>
+            <div class="flow-box chunk-combo compact" data-left="660" data-top="636" style="left:660px; top:636px; width:110px;">Z(H1&cap;H2)</div>
+            <div class="flow-wlabel" style="left:775px; top:636px; width:120px; text-align:left; font-size:11px;">under H0: <strong style="font-size:13px; color:#4a3d8f;">&sim; N(0,1)</strong></div>
+
+            <div style="position:absolute; left:20px; top:670px; width:860px; padding:10px 14px; box-sizing:border-box; background:rgba(124,110,232,0.1); border:1.6px solid #7c6ee8; border-radius:8px; font-size:12px; color:#3a2f73; text-align:center;">
+              If both <strong>Z(H2)</strong> and <strong>Z(H1&cap;H2)</strong> give <strong>p &lt; 0.025</strong>, then <strong>H2 is rejected overall</strong>.
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>The Gap Between Phase 2 and Phase 3</h2>
+      <div class="gap2-wrap">
+        <div class="gap2-stage">
+
+          <div class="gap2-pill" style="left:25px; top:10px; width:285px; height:34px; background:#2c3e5c; color:#fff;">Phase 2 (Dose Optimization)</div>
+          <div class="gap2-pill" style="left:322px; top:10px; width:255px; height:34px; background:#fdf1de; color:#a65d00; border:1.5px dashed #ba7517;">Gap / Transition</div>
+          <div class="gap2-pill" style="left:589px; top:10px; width:284px; height:34px; background:#2a9d8f; color:#fff;">Phase 3 (Confirmatory)</div>
+          <div class="gap2-bar" style="left:25px; top:46px; width:285px; height:8px; background:#2c3e5c;"></div>
+          <div class="gap2-bar" style="left:322px; top:46px; width:255px; height:8px; background:#ba7517;"></div>
+          <div class="gap2-bar" style="left:589px; top:46px; width:284px; height:8px; background:#2a9d8f;"></div>
+          <div class="gap2-arrow" style="left:855px; top:36px;">&#9654;</div>
+
+          <div class="gap2-label" style="left:25px; top:64px; color:#b03020;"><span class="sq" style="background:#b03020;"></span>Separate Phase 2 &rarr; Phase 3</div>
+          <div class="gap2-box" style="left:25px; top:98px; width:280px; height:206px; background:#f4f6f8; border:1px solid #ccc;"></div>
+          <div class="gap2-stat" style="left:25px; top:102px; width:280px; font-size:30px; color:#b03020;">&#9201;</div>
+          <div class="gap2-stat" style="left:25px; top:158px; width:280px; font-size:21px; color:#b03020;">&gt; 12 months</div>
+          <div class="gap2-stat" style="left:25px; top:204px; width:280px; font-size:12px; font-style:italic; font-weight:500; color:#8096a7;">for a global trial</div>
+
+          <div class="gap2-box" style="left:322px; top:98px; width:255px; height:206px; background:rgba(176,48,32,0.07); border:1px solid #b03020;"></div>
+          <div class="gap2-strip" style="left:322px; top:98px; width:255px; height:27px; background:#b03020; font-size:10.5px; white-space:nowrap;">&ldquo;Dead time&rdquo;: activities required before Phase 3</div>
+          <div class="gap2-item" style="left:333px; top:130px; width:234px;"><span class="sq" style="background:#b03020;"></span>DBL &amp; final Phase 2 data package</div>
+          <div class="gap2-item" style="left:333px; top:154px; width:234px;"><span class="sq" style="background:#b03020;"></span>Data summary and reporting</div>
+          <div class="gap2-item" style="left:333px; top:178px; width:234px;"><span class="sq" style="background:#b03020;"></span>End-of-Phase 2 (EOP2) FDA meeting</div>
+          <div class="gap2-item" style="left:333px; top:202px; width:234px;"><span class="sq" style="background:#b03020;"></span>Phase 3 protocol &amp; SAP finalization</div>
+          <div class="gap2-item" style="left:333px; top:226px; width:234px;"><span class="sq" style="background:#b03020;"></span>ICF, site-facing document</div>
+          <div class="gap2-item" style="left:333px; top:250px; width:234px;"><span class="sq" style="background:#b03020;"></span>Site/vendor contracting &amp; activation</div>
+          <div class="gap2-item" style="left:333px; top:274px; width:234px;"><span class="sq" style="background:#b03020;"></span>Country/IRB/ethics resubmissions</div>
+
+          <div class="gap2-box" style="left:589px; top:98px; width:284px; height:206px; background:#f4f6f8; border:1px solid #ccc;"></div>
+          <div class="gap2-outcome" style="left:589px; top:98px; width:284px; height:206px; color:#b03020;">Phase 3 starts after all activities are complete &mdash; months later</div>
+
+          <div class="gap2-label" style="left:25px; top:330px; color:#2a9d8f;"><span class="sq" style="background:#2a9d8f;"></span>Seamless Phase 2/3 Design</div>
+          <div class="gap2-box" style="left:322px; top:346px; width:255px; height:136px; background:#fdf6ec; border:1.5px dashed #ba7517;"></div>
+          <div class="gap2-pill" style="left:333px; top:352px; width:234px; height:42px; background:#2c3e5c; color:#fff; font-size:9.5px; line-height:1.35; flex-direction:column; white-space:nowrap;"><strong style="font-size:11.5px;">Wk 1&ndash;3</strong>Data cleaning &amp; DBL &middot; enrollment open &#10003;</div>
+          <div class="gap2-pill" style="left:333px; top:398px; width:234px; height:42px; background:#2a9d8f; color:#fff; font-size:9px; line-height:1.35; flex-direction:column; white-space:nowrap;"><strong style="font-size:11px;">Wk 4&ndash;6</strong>DMC meeting + dose decision &middot; enrollment open &#10003;</div>
+          <div class="gap2-stat" style="left:333px; top:444px; width:234px; font-size:13px; color:#a65d00;">~6 weeks total &middot; No enrollment pause</div>
+
+          <div class="gap2-box" style="left:589px; top:346px; width:284px; height:136px; background:#f4f6f8; border:1px solid #ccc;"></div>
+          <div class="gap2-outcome" style="left:589px; top:346px; width:284px; height:136px; color:#2a9d8f;">Selected dose continues enrollment without interruption</div>
+
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>The gsDose R Package</h2>
+      <p class="demo-link" style="margin-top:0;">
+        &#11088; <a href="https://github.com/eric-zhang16/gsDose" target="_blank">github.com/eric-zhang16/gsDose</a>
+      </p>
+      <div class="two-col">
+        <div class="col">
+          <h4>Three functions</h4>
+          <table class="result-table" style="font-size:0.5em; width:100%;">
+            <thead><tr><th style="text-align:left;">Function</th><th style="text-align:left;">Purpose</th></tr></thead>
+            <tbody>
+              <tr><td style="text-align:left;"><code>gsBoundary()</code></td><td style="text-align:left;">Group sequential efficacy / futility boundaries for the combination test, via &alpha;-spending (O'Brien-Fleming or Hwang-Shih-DeCani)</td></tr>
+              <tr><td style="text-align:left;"><code>combTest()</code></td><td style="text-align:left;">Combination test statistics for every intersection hypothesis containing the selected dose, with the closed-testing decision</td></tr>
+              <tr><td style="text-align:left;"><code>combDunnett()</code></td><td style="text-align:left;">Combination Z for one intersection hypothesis (called by <code>combTest()</code>)</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="col">
+          <h4>Vignette example</h4>
+          <pre style="font-size:0.42em;"><code class="language-r nohighlight">library(gsDose)
+# boundary at IA2 (270 events, 231 from cohort 2)
+gsBoundary(w = 1, h = h, d = 270, d2 = 231,
+           s = 3, planD = 520, alpha = 0.025,
+           sf = 'OF', bt = 'upper')
+#&gt; Zbound = 2.90</code></pre>
+          <p style="font-size:0.42em; color:#9aa3b2; margin-top:0.6em;">
+            Full walkthrough: <code>vignette("Introduction", package = "gsDose")</code>
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Use gsDose with an AI Agent</h2>
+      <p class="what-it-does">
+        <a href="https://github.com/eric-zhang16/gsdose-skill" target="_blank">gsdose-skill</a> &mdash; a Claude Code skill that
+        turns gsDose into a guided Q&amp;A, then delivers a Word + JSON report with a reproducible R script.
+      </p>
+      <div class="two-col">
+        <div class="col">
+          <h4>Why a skill</h4>
+          <ul>
+            <li>Boundary calculation becomes a dialogue &mdash; <em>&ldquo;What's your total alpha and spending function?&rdquo; &rarr; &ldquo;How many analyses, at what information fractions?&rdquo;</em> &mdash; then the boundary is computed</li>
+            <li>Validation catches inconsistent inputs (ratios, weights, event monotonicity) before any number is computed</li>
+            <li>You decide design assumptions and options; execution is deferred to the agent</li>
+          </ul>
+        </div>
+        <div class="col">
+          <h4>Output structure</h4>
+          <pre><code class="nohighlight">output/gsdose_{indication}_{date}/
+|-- deliverables/
+|   |-- gsdose_report.docx
+|   |-- gsdose_results.json
+|   `-- gsdose_reproduce.R
+`-- supporting/
+    |-- configs (json)
+    `-- scripts used</code></pre>
+        </div>
+      </div>
+      <p class="demo-link">&#11088; <a href="https://github.com/eric-zhang16/gsdose-skill" target="_blank">github.com/eric-zhang16/gsdose-skill</a></p>
+    </section>
+
+    <section>
+      <h2>Summary</h2>
+      <div class="two-col">
+        <div class="col">
+          <h4>Type I Error Control Across Endpoints, Doses &amp; Interim Analyses</h4>
+          <ul>
+            <li><strong>Inverse Normal Combination Test</strong> &rarr; mid-trial adaptation (dose selection)</li>
+            <li><strong>Closed Testing Procedure</strong> &rarr; multiple dose arms</li>
+            <li><strong>Group Sequential Design</strong> &rarr; multiple interim analyses</li>
+            <li><strong>Alpha recycle between endpoints</strong> &rarr; possible in some settings, needs simulation confirmation
+              <br><span style="font-size:0.82em; color:#9aa3b2; font-style:italic;">Note: a trial is typically powered under its initially assigned &alpha;, so the benefit of alpha recycling is limited.</span>
+            </li>
+          </ul>
+        </div>
+        <div class="col">
+          <h4>Two Major Benefits of the Seamless Phase 2/3 Design</h4>
+          <ul>
+            <li><strong>Smaller sample size</strong> &mdash; Phase 2 OS data carried into Phase 3, no data wasted</li>
+            <li><strong>Faster timeline</strong> &mdash; eliminates the &gt;12-month dead time between Phase 2 and Phase 3</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>References</h2>
+      <div class="refs">
+        <p>Zhang, E. (P.) &amp; Jin, M. (2025). <em>A Multi-Arm Multi-Stage Group Sequential Phase 2/3 Design with Dose Selection for
+        Oncology Trials.</em> Statistics in Biopharmaceutical Research.
+        <a href="https://doi.org/10.1080/19466315.2025.2539831" target="_blank">doi:10.1080/19466315.2025.2539831</a></p>
+        <p>Package: <a href="https://github.com/eric-zhang16/gsDose" target="_blank">github.com/eric-zhang16/gsDose</a>
+        &mdash; <code>remotes::install_github("eric-zhang16/gsDose")</code></p>
+        <p>Agent skill: <a href="https://github.com/eric-zhang16/gsdose-skill" target="_blank">github.com/eric-zhang16/gsdose-skill</a></p>
+      </div>
+    </section>
+
+    <section>
+      <h2>Backup</h2>
+    </section>
+
+    <section>
+      <h2>Completed Example &mdash; All Pieces Filled In</h2>
+      <p class="what-it-does" style="margin:0.2em 0 0.4em; font-size:0.42em;">
+        Same example, worked through: reject <strong>H2 overall</strong> only if both <strong>Z(H2)</strong> and
+        <strong>Z(H1 &cap; H2)</strong> give <strong>p &lt; 0.025</strong>.
+      </p>
+
+      <div class="flow-outer">
+        <div class="flow-wrap">
+          <div class="flow-stage" id="flowStageFixed">
+
+            <div class="flow-note-sm" style="left:260px;">1:1:1 randomization</div>
+            <div class="flow-note-sm" style="left:500px;">1:1 randomization</div>
+
+            <div class="flow-tp-line ia1" style="left:380px;"></div>
+            <div class="flow-tp-label ia1" style="left:380px;">IA1: dose selection</div>
+            <div class="flow-tp-line ia2" style="left:600px;"></div>
+            <div class="flow-tp-label ia2" style="left:600px;">IA2: confirmatory</div>
+            <div class="flow-tp-line fa" style="left:820px;"></div>
+            <div class="flow-tp-label fa" style="left:820px;">FA: confirmatory</div>
+
+            <div class="flow-arm-label" style="top:74px;">Low Dose</div>
+            <div class="flow-bar pre" style="left:140px; top:70px; width:460px;"></div>
+            <div class="flow-bar pre" style="left:600px; top:70px; width:220px;"></div>
+            <div class="flow-box chip chunk-pre" style="left:145px; top:71px; width:100px;">Low &middot; C1 &le;IA2</div>
+            <div class="flow-box chip chunk-pre" style="left:605px; top:71px; width:100px;">Low &middot; C1 IA2&rarr;FA</div>
+            <div class="flow-empty" style="left:380px; top:92px; width:440px; height:20px;">Low Dose &mdash; no Cohort 2 (dropped at IA1)</div>
+
+            <div class="flow-arm-label" style="top:128px;">High Dose &#9733;</div>
+            <div class="flow-bar pre" style="left:140px; top:124px; width:460px;"></div>
+            <div class="flow-bar pre" style="left:600px; top:124px; width:220px;"></div>
+            <div class="flow-bar post" style="left:380px; top:146px; width:440px;"></div>
+            <div class="flow-box chip chunk-pre" style="left:145px; top:125px; width:100px;">High &middot; C1 &le;IA2</div>
+            <div class="flow-box chip chunk-pre" style="left:605px; top:125px; width:100px;">High &middot; C1 IA2&rarr;FA</div>
+            <div class="flow-box chip chunk-post" style="left:385px; top:147px; width:100px;">High &middot; C2 &le;FA</div>
+
+            <div class="flow-arm-label" style="top:182px;">Control</div>
+            <div class="flow-bar pre" style="left:140px; top:178px; width:460px;"></div>
+            <div class="flow-bar pre" style="left:600px; top:178px; width:220px;"></div>
+            <div class="flow-bar post" style="left:380px; top:200px; width:440px;"></div>
+            <div class="flow-box chip chunk-pre" style="left:145px; top:179px; width:100px;">Ctrl &middot; C1 &le;IA2</div>
+            <div class="flow-box chip chunk-pre" style="left:605px; top:179px; width:100px;">Ctrl &middot; C1 IA2&rarr;FA</div>
+            <div class="flow-box chip chunk-post" style="left:385px; top:201px; width:100px;">Ctrl &middot; C2 &le;FA</div>
+
+            <div class="flow-divider">&#10003; every chunk placed &mdash; completed log-rank pieces:</div>
+
+            <div class="flow-zone-cap" style="left:20px; top:250px;"><strong>Log-rank pieces for H2</strong> (High dose vs. Control):</div>
+            <div class="flow-zone-cap" style="left:20px; top:264px;"><strong>&#9312;</strong> Cohort 1, up to IA2</div>
+            <div class="flow-box chip chunk-pre" style="left:20px; top:278px; width:100px;">High &middot; C1 &le;IA2</div>
+            <div class="flow-vs" style="left:20px; top:298px; width:100px;">vs</div>
+            <div class="flow-box chip chunk-pre" style="left:20px; top:312px; width:100px;">Ctrl &middot; C1 &le;IA2</div>
+            <div class="flow-vs" style="left:125px; top:296px; width:15px;">=</div>
+            <div class="flow-box chunk-pre compact" style="left:140px; top:296px; width:90px;">Z<sub>H2,1</sub></div>
+
+            <div class="flow-zone-cap" style="left:300px; top:264px;"><strong>&#9313;</strong> Cohort 1, IA2 &rarr; FA</div>
+            <div class="flow-box chip chunk-pre" style="left:300px; top:278px; width:100px;">High &middot; C1 IA2&rarr;FA</div>
+            <div class="flow-vs" style="left:300px; top:298px; width:100px;">vs</div>
+            <div class="flow-box chip chunk-pre" style="left:300px; top:312px; width:100px;">Ctrl &middot; C1 IA2&rarr;FA</div>
+            <div class="flow-vs" style="left:405px; top:296px; width:15px;">=</div>
+            <div class="flow-box chunk-pre compact" style="left:420px; top:296px; width:90px;">Z<sub>H2,2</sub></div>
+
+            <div class="flow-zone-cap" style="left:580px; top:264px;"><strong>&#9314;</strong> Cohort 2, up to FA</div>
+            <div class="flow-box chip chunk-post" style="left:580px; top:278px; width:100px;">High &middot; C2 &le;FA</div>
+            <div class="flow-vs" style="left:580px; top:298px; width:100px;">vs</div>
+            <div class="flow-box chip chunk-post" style="left:580px; top:312px; width:100px;">Ctrl &middot; C2 &le;FA</div>
+            <div class="flow-vs" style="left:685px; top:296px; width:15px;">=</div>
+            <div class="flow-box chunk-post compact" style="left:700px; top:296px; width:90px;">Z<sub>H2</sub></div>
+
+            <div class="flow-zone-cap" style="left:20px; top:350px;"><strong>Log-rank pieces for H1</strong> (Low dose vs. Control &mdash; no Cohort 2, dropped at IA1):</div>
+            <div class="flow-zone-cap" style="left:20px; top:364px;"><strong>&#9315;</strong> Cohort 1, up to IA2</div>
+            <div class="flow-box chip chunk-pre" style="left:20px; top:378px; width:100px;">Low &middot; C1 &le;IA2</div>
+            <div class="flow-vs" style="left:20px; top:398px; width:100px;">vs</div>
+            <div class="flow-box chip chunk-pre" style="left:20px; top:412px; width:100px;">Ctrl &middot; C1 &le;IA2</div>
+            <div class="flow-vs" style="left:125px; top:396px; width:15px;">=</div>
+            <div class="flow-box chunk-pre compact" style="left:140px; top:396px; width:90px;">Z<sub>H1,1</sub></div>
+
+            <div class="flow-zone-cap" style="left:300px; top:364px;"><strong>&#9316;</strong> Cohort 1, IA2 &rarr; FA</div>
+            <div class="flow-box chip chunk-pre" style="left:300px; top:378px; width:100px;">Low &middot; C1 IA2&rarr;FA</div>
+            <div class="flow-vs" style="left:300px; top:398px; width:100px;">vs</div>
+            <div class="flow-box chip chunk-pre" style="left:300px; top:412px; width:100px;">Ctrl &middot; C1 IA2&rarr;FA</div>
+            <div class="flow-vs" style="left:405px; top:396px; width:15px;">=</div>
+            <div class="flow-box chunk-pre compact" style="left:420px; top:396px; width:90px;">Z<sub>H1,2</sub></div>
+
+            <div style="position:absolute; left:20px; top:436px; width:860px; height:0; border-top:1.5px solid #ccc;"></div>
+
+            <div class="flow-zone-cap" style="left:20px; top:450px;"><strong>H2 &mdash; combination tests</strong> (inverse-normal unless noted):</div>
+            <div class="flow-zone-cap" style="left:20px; top:464px;"><strong>&#9317;</strong> Cohort 1 (w)</div>
+            <div class="flow-box chunk-pre compact" style="left:20px; top:478px; width:90px;">Z<sub>H2,1</sub></div>
+            <div class="flow-op" style="left:115px; top:478px; width:15px;">+</div>
+            <div class="flow-box chunk-pre compact" style="left:135px; top:478px; width:90px;">Z<sub>H2,2</sub></div>
+            <div class="flow-wlabel" style="left:230px; top:479px; width:35px;">(w)</div>
+            <div class="flow-op" style="left:270px; top:478px; width:15px;">=</div>
+            <div class="flow-box chunk-combo compact" style="left:290px; top:478px; width:80px;">Z<sub>1,H2</sub></div>
+
+            <div class="flow-zone-cap" style="left:410px; top:464px;"><strong>&#9318;</strong> Overall (h): cohort 1 + cohort 2</div>
+            <div class="flow-box chunk-combo compact" style="left:410px; top:478px; width:90px;">Z<sub>1,H2</sub></div>
+            <div class="flow-op" style="left:505px; top:478px; width:15px;">+</div>
+            <div class="flow-box chunk-post compact" style="left:525px; top:478px; width:90px;">Z<sub>H2</sub></div>
+            <div class="flow-wlabel" style="left:620px; top:479px; width:35px;">(h)</div>
+            <div class="flow-op" style="left:660px; top:478px; width:15px;">=</div>
+            <div class="flow-box chunk-combo compact" style="left:680px; top:478px; width:80px;">Z(H2)</div>
+            <div class="flow-wlabel" style="left:765px; top:478px; width:120px; text-align:left; font-size:11px;">under H0: <strong style="font-size:13px; color:#4a3d8f;">&sim; N(0,1)</strong></div>
+
+            <div class="flow-zone-cap" style="left:20px; top:512px;"><strong>H1 &cap; H2 &mdash; Dunnett combination</strong> (per testing stage, across the two doses):</div>
+            <div class="flow-zone-cap" style="left:20px; top:526px;"><strong>&#9319;</strong> Stage 1 (&le;IA2)</div>
+            <div class="flow-box chunk-pre compact" style="left:20px; top:540px; width:90px;">Z<sub>H1,1</sub></div>
+            <div class="flow-op" style="left:20px; top:560px; width:90px;">+</div>
+            <div class="flow-box chunk-pre compact" style="left:20px; top:574px; width:90px;">Z<sub>H2,1</sub></div>
+            <div class="flow-wlabel" style="left:125px; top:558px; width:60px;">(Dunnett)</div>
+            <div class="flow-op" style="left:190px; top:558px; width:15px;">=</div>
+            <div class="flow-box chunk-combo compact" style="left:210px; top:558px; width:50px;">D<sub>1</sub></div>
+
+            <div class="flow-zone-cap" style="left:410px; top:526px;"><strong>&#9320;</strong> Stage 2 (IA2&rarr;FA)</div>
+            <div class="flow-box chunk-pre compact" style="left:410px; top:540px; width:90px;">Z<sub>H1,2</sub></div>
+            <div class="flow-op" style="left:410px; top:560px; width:90px;">+</div>
+            <div class="flow-box chunk-pre compact" style="left:410px; top:574px; width:90px;">Z<sub>H2,2</sub></div>
+            <div class="flow-wlabel" style="left:515px; top:558px; width:60px;">(Dunnett)</div>
+            <div class="flow-op" style="left:580px; top:558px; width:15px;">=</div>
+            <div class="flow-box chunk-combo compact" style="left:600px; top:558px; width:50px;">D<sub>2</sub></div>
+
+            <div class="flow-zone-cap" style="left:20px; top:608px;"><strong>H1 &cap; H2 &mdash; combination tests</strong> (inverse-normal: stages, then cohort 1 + cohort 2):</div>
+            <div class="flow-zone-cap" style="left:20px; top:622px;"><strong>&#9321;</strong> Cohort 1 (w)</div>
+            <div class="flow-box chunk-combo compact" style="left:20px; top:636px; width:50px;">D<sub>1</sub></div>
+            <div class="flow-op" style="left:75px; top:636px; width:15px;">+</div>
+            <div class="flow-box chunk-combo compact" style="left:95px; top:636px; width:50px;">D<sub>2</sub></div>
+            <div class="flow-wlabel" style="left:150px; top:637px; width:35px;">(w)</div>
+            <div class="flow-op" style="left:190px; top:636px; width:15px;">=</div>
+            <div class="flow-box chunk-combo compact" style="left:210px; top:636px; width:70px;">Z<sub>1,&cap;</sub></div>
+
+            <div class="flow-zone-cap" style="left:410px; top:622px;"><strong>&#9322;</strong> Overall (h): cohort 1 + cohort 2</div>
+            <div class="flow-box chunk-combo compact" style="left:410px; top:636px; width:70px;">Z<sub>1,&cap;</sub></div>
+            <div class="flow-op" style="left:485px; top:636px; width:15px;">+</div>
+            <div class="flow-box chunk-post compact" style="left:505px; top:636px; width:90px;">Z<sub>H2</sub></div>
+            <div class="flow-wlabel" style="left:600px; top:637px; width:35px;">(h)</div>
+            <div class="flow-op" style="left:640px; top:636px; width:15px;">=</div>
+            <div class="flow-box chunk-combo compact" style="left:660px; top:636px; width:110px;">Z(H1&cap;H2)</div>
+            <div class="flow-wlabel" style="left:775px; top:636px; width:120px; text-align:left; font-size:11px;">under H0: <strong style="font-size:13px; color:#4a3d8f;">&sim; N(0,1)</strong></div>
+
+            <div style="position:absolute; left:20px; top:670px; width:860px; padding:10px 14px; box-sizing:border-box; background:rgba(124,110,232,0.1); border:1.6px solid #7c6ee8; border-radius:8px; font-size:12px; color:#3a2f73; text-align:center;">
+              If both <strong>Z(H2)</strong> and <strong>Z(H1&cap;H2)</strong> give <strong>p &lt; 0.025</strong>, then <strong>H2 is rejected overall</strong>.
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/highlight.js"></script>
+<script>
+  Reveal.initialize({
+    hash: true,
+    slideNumber: 'c/t',
+    plugins: [ RevealHighlight ]
+  });
+</script>
+<script>
+  (function () {
+    var boxes = document.querySelectorAll('#flowStage .flow-box');
+    boxes.forEach(function (box) {
+      var dragging = false, startX, startY, origLeft, origTop;
+      box.addEventListener('pointerdown', function (e) {
+        dragging = true;
+        box.classList.add('dragging');
+        startX = e.clientX;
+        startY = e.clientY;
+        origLeft = parseFloat(box.style.left);
+        origTop = parseFloat(box.style.top);
+        try { box.setPointerCapture(e.pointerId); } catch (err) {}
+        e.stopPropagation();
+      });
+      box.addEventListener('pointermove', function (e) {
+        if (!dragging) return;
+        var scale = (window.Reveal && Reveal.getScale) ? Reveal.getScale() : 1;
+        box.style.left = (origLeft + (e.clientX - startX) / scale) + 'px';
+        box.style.top = (origTop + (e.clientY - startY) / scale) + 'px';
+        e.stopPropagation();
+      });
+      function stopDrag(e) {
+        if (!dragging) return;
+        dragging = false;
+        box.classList.remove('dragging');
+      }
+      box.addEventListener('pointerup', stopDrag);
+      box.addEventListener('pointercancel', stopDrag);
+    });
+
+    var resetBtn = document.querySelector('.flow-reset');
+    if (resetBtn) {
+      resetBtn.addEventListener('click', function () {
+        boxes.forEach(function (box) {
+          box.style.left = box.getAttribute('data-left') + 'px';
+          box.style.top = box.getAttribute('data-top') + 'px';
+        });
+      });
+    }
+  })();
+</script>
+</body>
+</html>

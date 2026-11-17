@@ -1,0 +1,69 @@
+<svg width="900" height="370" viewBox="0 0 900 370" xmlns="http://www.w3.org/2000/svg">
+<style>
+  text { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+  .th { font-size: 13px; font-weight: 700; fill: #222; }
+  .ts { font-size: 11px; fill: #555; }
+  .lab { font-size: 12px; font-weight: 600; fill: #222; }
+  .small { font-size: 10px; fill: #666; }
+  .arr { stroke: #888; stroke-width: 1.4; fill: none; marker-end: url(#arr); }
+</style>
+<defs>
+<marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+<path d="M2 1L8 5L2 9" fill="none" stroke="#888" stroke-width="1.4" stroke-linecap="round"/>
+</marker>
+</defs>
+
+<text class="small" x="140" y="20"><tspan font-weight="700" fill="#222">OS endpoint &#183; High dose selected at IA1</tspan></text>
+
+<!-- randomization -->
+<text class="small" x="260" y="54" text-anchor="middle">1:1:1 randomization</text>
+<text class="small" x="500" y="54" text-anchor="middle">1:1 randomization</text>
+
+<!-- Low Dose: Cohort 1 row (followed to FA, no grey-out) + Cohort 2 row (none, dropped at IA1) -->
+<text class="lab" x="20" y="84">Low Dose</text>
+<rect x="140" y="70" width="680" height="20" rx="4" fill="#BA7517" fill-opacity="0.22" stroke="#BA7517" stroke-width="1.2"/>
+<text class="small" x="150" y="84" fill="#6b4a0e" font-weight="700">Cohort 1</text>
+<text class="small" x="600" y="84" text-anchor="middle" fill="#8a6a2e">followed for events to FA &#8212; no new enrollment after IA1</text>
+
+<rect x="380" y="92" width="440" height="20" fill="none" stroke="#ccc" stroke-width="0.8" stroke-dasharray="2 2"/>
+<text class="small" x="600" y="106" text-anchor="middle" fill="#aaa" font-style="italic">no Cohort 2 &#8212; dose dropped at IA1</text>
+
+<!-- High Dose (selected): Cohort 1 row (followed to FA) + Cohort 2 row -->
+<text class="lab" x="20" y="138">High Dose &#9733;</text>
+<rect x="140" y="124" width="680" height="20" rx="4" fill="#BA7517" fill-opacity="0.22" stroke="#BA7517" stroke-width="1.2"/>
+<text class="small" x="150" y="138" fill="#6b4a0e" font-weight="700">Cohort 1</text>
+
+<rect x="380" y="146" width="440" height="20" rx="4" fill="#2a9d8f" fill-opacity="0.22" stroke="#2a9d8f" stroke-width="1.6"/>
+<text class="small" x="390" y="160" fill="#1d6358" font-weight="700">Cohort 2</text>
+
+<!-- Control: Cohort 1 row (followed to FA) + Cohort 2 row -->
+<text class="lab" x="20" y="192">Control</text>
+<rect x="140" y="178" width="680" height="20" rx="4" fill="#BA7517" fill-opacity="0.22" stroke="#BA7517" stroke-width="1.2"/>
+<text class="small" x="150" y="192" fill="#6b4a0e" font-weight="700">Cohort 1</text>
+
+<rect x="380" y="200" width="440" height="20" rx="4" fill="#2a9d8f" fill-opacity="0.22" stroke="#2a9d8f" stroke-width="1.6"/>
+<text class="small" x="390" y="214" fill="#1d6358" font-weight="700">Cohort 2</text>
+
+<!-- analysis timepoints: dose selection (IA1) vs confirmatory testing (IA2, FA) -->
+<line x1="380" y1="44" x2="380" y2="236" stroke="#C0614B" stroke-width="1.6" stroke-dasharray="5 3"/>
+<text class="ts" x="380" y="36" text-anchor="middle" fill="#C0614B" font-weight="700">IA1: dose selection</text>
+
+<line x1="600" y1="44" x2="600" y2="236" stroke="#2a9d8f" stroke-width="1.6" stroke-dasharray="5 3"/>
+<text class="ts" x="600" y="36" text-anchor="middle" fill="#2a9d8f" font-weight="700">IA2: confirmatory</text>
+
+<line x1="820" y1="44" x2="820" y2="236" stroke="#2a9d8f" stroke-width="1.6" stroke-dasharray="5 3"/>
+<text class="ts" x="820" y="36" text-anchor="middle" fill="#2a9d8f" font-weight="700">FA: confirmatory</text>
+
+<!-- time axis -->
+<line x1="140" y1="250" x2="850" y2="250" class="arr"/>
+<text class="small" x="856" y="254">time (OS)</text>
+
+<!-- phase brackets -->
+<path d="M140 270 L140 285 L380 285 L380 270" fill="none" stroke="#BA7517" stroke-width="1.4"/>
+<text class="th" x="260" y="306" text-anchor="middle" fill="#BA7517">Phase 2</text>
+<text class="ts" x="260" y="324" text-anchor="middle" font-weight="700">IA1 &#8212; dose selection</text>
+
+<path d="M380 270 L380 285 L820 285 L820 270" fill="none" stroke="#2a9d8f" stroke-width="1.4"/>
+<text class="th" x="600" y="306" text-anchor="middle" fill="#2a9d8f">Phase 3</text>
+<text class="ts" x="600" y="324" text-anchor="middle" font-weight="700">IA2, FA &#8212; confirmatory testing</text>
+</svg>
